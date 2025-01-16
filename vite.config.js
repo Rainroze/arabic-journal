@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'المجلة العربية',
         short_name: 'المجلة',
         description: 'مجلة يومية للأذكار والأهداف',
-        theme_color: '#9c27b0',
+        theme_color: '#2196F3',
         icons: [
           {
             src: '/icon-192.png',

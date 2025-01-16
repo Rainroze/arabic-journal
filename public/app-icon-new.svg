@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- خلفية مستطيلة مع حواف دائرية -->
+  <rect width="512" height="512" rx="128" fill="#2196F3"/>
+  
+  <!-- تأثير الظل للدفتر -->
+  <rect x="96" y="76" width="320" height="360" rx="24" fill="#1E88E5"/>
+  
+  <!-- الدفتر الرئيسي -->
+  <rect x="86" y="66" width="320" height="360" rx="24" fill="white"/>
+  
+  <!-- خطوط الدفتر -->
+  <rect x="106" y="96" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="146" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="196" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="246" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="296" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="346" width="280" height="2" fill="#E3F2FD"/>
+  
+  <!-- حلقات الدفتر -->
+  <circle cx="106" cy="96" r="8" fill="#FF4081"/>
+  <circle cx="106" cy="196" r="8" fill="#FF4081"/>
+  <circle cx="106" cy="296" r="8" fill="#FF4081"/>
+  
+  <!-- القلم -->
+  <path d="M386 156L356 186L326 366L356 386L386 366L356 186L386 156Z" fill="#FF4081"/>
+  <path d="M386 156L356 126L326 156L356 186L386 156Z" fill="#F50057"/>
+  
+  <!-- علامات التبويب الملونة -->
+  <rect x="380" y="106" width="40" height="60" rx="8" fill="#FF4081"/>
+  <rect x="380" y="176" width="40" height="60" rx="8" fill="#FFC107"/>
+  <rect x="380" y="246" width="40" height="60" rx="8" fill="#4CAF50"/>
+</svg>
