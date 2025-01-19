@@ -92,14 +92,12 @@ function App() {
 
   const [titleStyle, setTitleStyle] = useState({
     bold: false,
-    italic: false,
     underline: false,
     color: '#2c3e50'
   });
 
   const [textStyle, setTextStyle] = useState({
     bold: false,
-    italic: false,
     underline: false,
     align: 'right',
     color: '#2c3e50'
@@ -714,13 +712,6 @@ function App() {
                   <span className="format-icon">B</span>
                 </button>
                 <button
-                  className={`format-btn ${titleStyle.italic ? 'active' : ''}`}
-                  onClick={() => formatTitle({ italic: !titleStyle.italic })}
-                  title="خط مائل"
-                >
-                  <span className="format-icon">I</span>
-                </button>
-                <button
                   className={`format-btn ${titleStyle.underline ? 'active' : ''}`}
                   onClick={() => formatTitle({ underline: !titleStyle.underline })}
                   title="تسطير"
@@ -752,6 +743,26 @@ function App() {
                   <span className="color-circle green"></span>
                 </button>
               </div>
+
+              <div className="format-group">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="format-btn"
+                  title="إضافة رموز تعبيرية"
+                >
+                  😊
+                </button>
+                {QUICK_EMOJIS.map(item => (
+                  <button
+                    key={item.emoji}
+                    onClick={() => handleQuickEmoji(item.emoji)}
+                    className="format-btn"
+                    title={item.label}
+                  >
+                    {item.emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="editor-toolbar">
@@ -762,13 +773,6 @@ function App() {
                   title="خط عريض"
                 >
                   <span className="format-icon">B</span>
-                </button>
-                <button
-                  className={`format-btn ${textStyle.italic ? 'active' : ''}`}
-                  onClick={() => formatText({ italic: !textStyle.italic })}
-                  title="خط مائل"
-                >
-                  <span className="format-icon">I</span>
                 </button>
                 <button
                   className={`format-btn ${textStyle.underline ? 'active' : ''}`}

@@ -1128,35 +1128,38 @@ p {
   padding: 12px !important;
   margin: 12px 0 !important;
   display: flex !important;
-  gap: 12px !important;
+  gap: 16px !important;
   flex-wrap: wrap !important;
   align-items: center !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }
 
 .format-group {
   display: flex !important;
-  gap: 4px !important;
-  padding: 4px !important;
-  border-left: 1px solid var(--border-color) !important;
+  gap: 6px !important;
+  padding: 4px 12px !important;
+  border-left: 2px solid var(--border-color) !important;
+  position: relative !important;
 }
 
 .format-group:last-child {
   border-left: none !important;
+  padding-left: 0 !important;
 }
 
 .format-btn {
-  width: 36px !important;
-  height: 36px !important;
+  width: 40px !important;
+  height: 40px !important;
   padding: 0 !important;
   border: 2px solid var(--border-color) !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   background-color: var(--background-color) !important;
   color: var(--text-color) !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 1em !important;
+  font-size: 1.1em !important;
   font-weight: 600 !important;
   transition: all 0.2s ease !important;
   position: relative !important;
@@ -1165,22 +1168,25 @@ p {
 .format-btn:hover {
   background-color: var(--hover-color) !important;
   border-color: var(--primary-color) !important;
-  transform: translateY(-1px) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .format-btn.active {
   background-color: var(--primary-color) !important;
   border-color: var(--primary-color) !important;
   color: white !important;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.2) !important;
 }
 
 .format-icon {
   font-family: 'Times New Roman', serif !important;
   font-weight: bold !important;
+  font-size: 1.2em !important;
 }
 
 .color-btn {
-  padding: 2px !important;
+  padding: 4px !important;
 }
 
 .color-circle {
@@ -1188,6 +1194,12 @@ p {
   height: 24px !important;
   border-radius: 50% !important;
   border: 2px solid var(--border-color) !important;
+  transition: all 0.2s ease !important;
+}
+
+.color-btn:hover .color-circle {
+  transform: scale(1.1) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .color-circle.purple {
@@ -1203,15 +1215,22 @@ p {
 }
 
 /* تحسين مظهر الأزرار في الوضع المظلم */
+[data-theme="dark"] .format-toolbar,
+[data-theme="dark"] .editor-toolbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
 [data-theme="dark"] .format-btn {
   border-color: var(--border-color) !important;
 }
 
 [data-theme="dark"] .format-btn:hover {
   background-color: var(--hover-color) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
 [data-theme="dark"] .format-btn.active {
   background-color: var(--primary-color) !important;
   border-color: var(--primary-color) !important;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3) !important;
 }
