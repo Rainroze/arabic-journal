@@ -228,20 +228,24 @@ function App() {
       [{ 'header': [1, 2, 3, false] }],
       ['bold', 'italic', 'underline', 'strike'],
       [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['image'],
+      [{ 'direction': 'rtl' }],
       ['clean']
-    ]
+    ],
+    keyboard: {
+      bindings: {
+        tab: false,
+        'remove tab': false
+      }
+    }
   }
 
   const formats = [
     'header',
     'bold', 'italic', 'underline', 'strike',
     'color', 'background',
-    'list', 'bullet',
     'align',
-    'image'
+    'direction'
   ]
 
   const imageHandler = () => {
@@ -452,6 +456,21 @@ function App() {
     }
   }
 
+  const handleNoteChange = (content) => {
+    setCurrentNote(prev => ({
+      ...prev,
+      content: content
+    }))
+  }
+
+  const handleTitleChange = (e) => {
+    const value = e.target.value
+    setCurrentNote(prev => ({
+      ...prev,
+      title: value
+    }))
+  }
+
   const NoteDialog = ({ isOpen, onClose, note, isEditing, onSave }) => {
     if (!isOpen) return null;
     
@@ -521,7 +540,7 @@ function App() {
             type="text"
             placeholder="عنوان المذكرة"
             value={note.title}
-            onChange={(e) => setCurrentNote({ ...note, title: e.target.value })}
+            onChange={handleTitleChange}
             style={{
               width: '100%',
               padding: '12px',
@@ -650,11 +669,12 @@ function App() {
 
           <ReactQuill
             ref={quillRef}
-            theme="snow"
             value={note.content}
-            onChange={(content) => setCurrentNote({ ...note, content })}
+            onChange={handleNoteChange}
             modules={modules}
             formats={formats}
+            placeholder="اكتب مذكرتك هنا..."
+            theme="snow"
             style={{
               direction: 'rtl',
               textAlign: 'right',
@@ -663,7 +683,8 @@ function App() {
               border: `2px solid ${getTheme().borderColor}`,
               borderRadius: '8px',
               marginBottom: '1rem',
-              fontSize: getFontSize()
+              fontSize: getFontSize(),
+              fontFamily: 'Noto Sans Arabic, sans-serif'
             }}
           />
 

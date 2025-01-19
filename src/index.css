@@ -98,6 +98,9 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .note-card:hover {
@@ -243,6 +246,8 @@ body {
   overflow-y: auto;
   flex-grow: 1;
   max-height: calc(80vh - 180px);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .athkar-item {
@@ -473,44 +478,42 @@ body {
   float: right;
 }
 
-/* تنسيقات محرر النص */
+/* تحسينات أداء الكتابة باللغة العربية */
 .ql-editor {
   direction: rtl !important;
   text-align: right !important;
-  font-family: 'Noto Sans Arabic', system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+  font-family: 'Noto Sans Arabic', sans-serif !important;
+  line-height: 1.8 !important;
+  padding: 12px 15px !important;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
-.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
-  right: auto !important;
-  left: 0 !important;
+.ql-editor p {
+  margin-bottom: 1em !important;
 }
 
-.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) .ql-picker-label {
-  padding-right: 8px !important;
-  padding-left: 20px !important;
+.note-title-input {
+  font-family: 'Noto Sans Arabic', sans-serif !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
-.ql-toolbar.ql-snow {
-  direction: rtl !important;
+/* تحسين أداء الحركة */
+.dialog, .note-card {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
-.ql-container {
-  font-family: inherit !important;
-}
-
-.ql-editor p,
-.ql-editor ol,
-.ql-editor ul,
-.ql-editor pre,
-.ql-editor blockquote,
-.ql-editor h1,
-.ql-editor h2,
-.ql-editor h3,
-.ql-editor h4,
-.ql-editor h5,
-.ql-editor h6 {
-  direction: rtl !important;
-  text-align: right !important;
+/* تحسين أداء التمرير */
+.ql-editor, .notes-container {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* تحسينات للشاشات الصغيرة */
