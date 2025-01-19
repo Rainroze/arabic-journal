@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
 import EmojiPicker from '@emoji-mart/react'
 import emojiData from '@emoji-mart/data'
 import moment from 'moment-hijri'
@@ -90,7 +88,6 @@ function App() {
   const [searchDate, setSearchDate] = useState('')
   const [filteredNotes, setFilteredNotes] = useState([])
   const fileInputRef = useRef(null)
-  const quillRef = useRef(null)
   const settingsRef = useRef(null)
 
   const generateThemeFromColor = (color) => {
@@ -212,108 +209,15 @@ function App() {
         img.src = imageUrl;
       });
 
-      const quill = quillRef.current?.getEditor();
-      if (quill) {
-        const range = quill.getSelection(true);
-        quill.insertEmbed(range.index, 'image', resizedImageUrl);
-      }
+      setCurrentNote(prev => ({
+        ...prev,
+        content: prev.content + `<img src="${resizedImageUrl}" />`
+      }))
     } catch (error) {
       console.error('خطأ في رفع الصورة:', error);
       alert('حدث خطأ في رفع الصورة');
     }
   };
-
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      [{ 'direction': 'rtl' }],
-      ['clean']
-    ],
-    keyboard: {
-      bindings: {
-        tab: false,
-        'remove tab': false
-      }
-    }
-  }
-
-  const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'align',
-    'direction'
-  ]
-
-  const imageHandler = () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
-
-    input.onchange = async () => {
-      const file = input.files[0];
-      if (file) {
-        try {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const range = quillRef.current.getEditor().getSelection();
-            quillRef.current.getEditor().insertEmbed(range.index, 'image', e.target.result);
-          };
-          reader.readAsDataURL(file);
-        } catch (error) {
-          console.error('خطأ في تحميل الصورة:', error);
-        }
-      }
-    };
-  };
-
-  useEffect(() => {
-    if (quillRef.current) {
-      const quill = quillRef.current.getEditor();
-      quill.getModule('toolbar').addHandler('image', imageHandler);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('darkMode', JSON.stringify(darkMode))
-      localStorage.setItem('customThemeColor', customThemeColor)
-      localStorage.setItem('fontSize', JSON.stringify(fontSize))
-      localStorage.setItem('notes', JSON.stringify(notes))
-      localStorage.setItem('categories', JSON.stringify(categories))
-    } catch (error) {
-      console.error('خطأ في حفظ البيانات:', error)
-    }
-  }, [darkMode, customThemeColor, fontSize, notes, categories])
-
-  useEffect(() => {
-    searchNotes()
-  }, [searchTerm, selectedCategory, searchDate, notes])
-
-  const searchNotes = () => {
-    let filtered = [...notes]
-    
-    if (searchTerm) {
-      filtered = filtered.filter(note => 
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    if (selectedCategory !== 'الكل') {
-      filtered = filtered.filter(note => note.category === selectedCategory)
-    }
-
-    if (searchDate) {
-      filtered = filtered.filter(note => note.date?.includes(searchDate))
-    }
-
-    setFilteredNotes(filtered)
-  }
 
   const handleAddClick = () => {
     setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام' })
@@ -392,11 +296,10 @@ function App() {
   }
 
   const handleQuickEmoji = (emoji) => {
-    if (quillRef.current) {
-      const editor = quillRef.current.getEditor()
-      const range = editor.getSelection(true)
-      editor.insertText(range.index, emoji)
-    }
+    setCurrentNote(prev => ({
+      ...prev,
+      content: prev.content + emoji
+    }))
   }
 
   const handleBackgroundColorChange = (color) => {
@@ -471,257 +374,42 @@ function App() {
     }))
   }
 
-  const NoteDialog = ({ isOpen, onClose, note, isEditing, onSave }) => {
-    if (!isOpen) return null;
+  useEffect(() => {
+    try {
+      localStorage.setItem('darkMode', JSON.stringify(darkMode))
+      localStorage.setItem('customThemeColor', customThemeColor)
+      localStorage.setItem('fontSize', JSON.stringify(fontSize))
+      localStorage.setItem('notes', JSON.stringify(notes))
+      localStorage.setItem('categories', JSON.stringify(categories))
+    } catch (error) {
+      console.error('خطأ في حفظ البيانات:', error)
+    }
+  }, [darkMode, customThemeColor, fontSize, notes, categories])
+
+  useEffect(() => {
+    searchNotes()
+  }, [searchTerm, selectedCategory, searchDate, notes])
+
+  const searchNotes = () => {
+    let filtered = [...notes]
     
-    return (
-      <div className="modal-overlay" style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        backdropFilter: 'blur(5px)'
-      }}>
-        <div className="modal-content" style={{
-          backgroundColor: getTheme().cardBg,
-          padding: '2rem',
-          borderRadius: '15px',
-          width: '90%',
-          maxWidth: '800px',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
-        }}>
-          <h2 style={{ 
-            marginTop: 0,
-            marginBottom: '15px',
-            color: getTheme().text,
-            borderBottom: `2px solid ${getTheme().borderColor}`,
-            paddingBottom: '10px'
-          }}>
-            {isEditing ? 'تعديل المذكرة' : 'مذكرة جديدة'}
-          </h2>
+    if (searchTerm) {
+      filtered = filtered.filter(note => 
+        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: getTheme().text }}>
-              لون خلفية المذكرة
-            </label>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {BACKGROUND_COLORS.map(color => (
-                <button
-                  key={color.value}
-                  onClick={() => handleBackgroundColorChange(color.value)}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    backgroundColor: color.value,
-                    border: note.backgroundColor === color.value ? 
-                      `2px solid ${getTheme().buttonBg}` : '1px solid #ddd',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s',
-                    ':hover': {
-                      transform: 'scale(1.1)'
-                    }
-                  }}
-                  title={color.label}
-                />
-              ))}
-            </div>
-          </div>
-            
-          <input
-            type="text"
-            placeholder="عنوان المذكرة"
-            value={note.title}
-            onChange={handleTitleChange}
-            style={{
-              width: '100%',
-              padding: '12px',
-              marginBottom: '1rem',
-              backgroundColor: getTheme().cardBg,
-              color: getTheme().text,
-              border: `2px solid ${getTheme().borderColor}`,
-              borderRadius: '8px',
-              fontSize: getFontSize(),
-              transition: 'border-color 0.3s ease'
-            }}
-          />
+    if (selectedCategory !== 'الكل') {
+      filtered = filtered.filter(note => note.category === selectedCategory)
+    }
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: getTheme().text }}>
-              تصنيف المذكرة
-            </label>
-            <select
-              value={note.category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                marginBottom: '1rem',
-                backgroundColor: getTheme().cardBg,
-                color: getTheme().text,
-                border: `2px solid ${getTheme().borderColor}`,
-                borderRadius: '8px',
-                fontSize: getFontSize(),
-                transition: 'border-color 0.3s ease'
-              }}
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
+    if (searchDate) {
+      filtered = filtered.filter(note => note.date?.includes(searchDate))
+    }
 
-          <div style={{ marginBottom: '1rem' }}>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '0.5rem' }}>
-              {QUICK_EMOJIS.map(item => (
-                <button
-                  key={item.emoji}
-                  onClick={() => handleQuickEmoji(item.emoji)}
-                  style={{
-                    padding: '8px',
-                    backgroundColor: getTheme().cardBg,
-                    border: `1px solid ${getTheme().borderColor}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontSize: '1.2rem',
-                    transition: 'transform 0.2s',
-                    ':hover': {
-                      transform: 'scale(1.1)'
-                    }
-                  }}
-                  title={item.label}
-                >
-                  {item.emoji}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '1rem', display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: getTheme().buttonBg,
-                color: getTheme().buttonText,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '1.1rem'
-              }}
-            >
-              😊 ملصق
-            </button>
-              
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: getTheme().buttonBg,
-                color: getTheme().buttonText,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '1.1rem'
-              }}
-            >
-              🖼️ إضافة صورة
-            </button>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
-          </div>
-
-          {showEmojiPicker && (
-            <div style={{
-              position: 'absolute',
-              zIndex: 1,
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)'
-            }}>
-              <EmojiPicker
-                data={emojiData}
-                onEmojiSelect={handleEmojiSelect}
-                theme={darkMode ? 'dark' : 'light'}
-              />
-            </div>
-          )}
-
-          <ReactQuill
-            ref={quillRef}
-            value={note.content}
-            onChange={handleNoteChange}
-            modules={modules}
-            formats={formats}
-            placeholder="اكتب مذكرتك هنا..."
-            theme="snow"
-            style={{
-              direction: 'rtl',
-              textAlign: 'right',
-              backgroundColor: getTheme().cardBg,
-              color: getTheme().text,
-              border: `2px solid ${getTheme().borderColor}`,
-              borderRadius: '8px',
-              marginBottom: '1rem',
-              fontSize: getFontSize(),
-              fontFamily: 'Noto Sans Arabic, sans-serif'
-            }}
-          />
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1rem' }}>
-            <button
-              onClick={onClose}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: darkMode ? '#404040' : '#e9ecef',
-                color: getTheme().text,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={onSave}
-              style={{
-                padding: '10px 24px',
-                backgroundColor: getTheme().buttonBg,
-                color: getTheme().buttonText,
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              حفظ
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+    setFilteredNotes(filtered)
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -737,7 +425,11 @@ function App() {
   }, [])
 
   return (
-    <div className="app-container" style={{ backgroundColor: getTheme().background }}>
+    <div className={`app ${darkMode ? 'dark' : ''}`} style={{ 
+      backgroundColor: getTheme().background,
+      color: getTheme().text,
+      fontSize: getFontSize(fontSize)
+    }}>
       <header style={{
         width: '100%',
         background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
@@ -954,13 +646,74 @@ function App() {
 
       <footer className="app-footer"></footer>
 
-      <NoteDialog 
-        isOpen={showDialog}
-        onClose={() => setShowDialog(false)}
-        note={currentNote}
-        isEditing={isEditing}
-        onSave={handleSaveNote}
-      />
+      {showDialog && (
+        <div className="dialog-overlay" onClick={(e) => {
+          if (e.target.className === 'dialog-overlay') {
+            setShowDialog(false)
+          }
+        }}>
+          <div className="dialog" style={{ backgroundColor: getTheme().cardBg }}>
+            <input
+              type="text"
+              placeholder="عنوان المذكرة..."
+              value={currentNote.title}
+              onChange={handleTitleChange}
+              className="note-title-input"
+              dir="rtl"
+              style={{ backgroundColor: currentNote.backgroundColor }}
+            />
+            <textarea
+              value={currentNote.content}
+              onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
+              placeholder="اكتب مذكرتك هنا..."
+              className="note-content-textarea"
+              dir="rtl"
+              style={{ 
+                backgroundColor: currentNote.backgroundColor,
+                color: getTheme().text,
+                minHeight: '300px',
+                fontSize: getFontSize(fontSize),
+                fontFamily: 'Noto Sans Arabic, sans-serif',
+                padding: '12px',
+                border: `1px solid ${getTheme().borderColor}`,
+                borderRadius: '4px',
+                width: '100%',
+                resize: 'vertical'
+              }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1rem' }}>
+              <button
+                onClick={() => setShowDialog(false)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: darkMode ? '#404040' : '#e9ecef',
+                  color: getTheme().text,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSaveNote}
+                style={{
+                  padding: '10px 24px',
+                  backgroundColor: getTheme().buttonBg,
+                  color: getTheme().buttonText,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showAthkar && (
         <Athkar onClose={() => setShowAthkar(false)} getTheme={getTheme} />
