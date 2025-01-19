@@ -114,6 +114,8 @@ function App() {
     color: '#2c3e50'
   });
 
+  const [showColorMenu, setShowColorMenu] = useState(false);
+
   const formatTitle = (style) => {
     setTitleStyle(prev => ({
       ...prev,
@@ -750,16 +752,33 @@ function App() {
               </div>
 
               <div className="format-group colors-group">
-                {COLOR_PALETTE.map(item => (
+                <div className="dropdown">
                   <button
-                    key={item.color}
-                    className="format-btn color-btn"
-                    onClick={() => formatTitle({ color: item.color })}
-                    title={item.label}
+                    className="format-btn menu-btn"
+                    onClick={() => setShowColorMenu(!showColorMenu)}
+                    title="تغيير لون النص"
                   >
-                    <span className="color-circle" style={{ backgroundColor: item.color }}></span>
+                    <span className="format-icon">🎨</span>
                   </button>
-                ))}
+                  {showColorMenu && (
+                    <div className="dropdown-menu colors-menu">
+                      {COLOR_PALETTE.map(item => (
+                        <button
+                          key={item.color}
+                          className="color-item"
+                          onClick={() => {
+                            formatTitle({ color: item.color });
+                            setShowColorMenu(false);
+                          }}
+                          title={item.label}
+                        >
+                          <span className="color-circle" style={{ backgroundColor: item.color }}></span>
+                          <span className="color-label">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="format-group emojis-group">
