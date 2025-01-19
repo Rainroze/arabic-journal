@@ -47,6 +47,17 @@ const BACKGROUND_COLORS = [
   { label: 'بيج فاتح', value: '#efebe9' }
 ]
 
+const CATEGORIES = [
+  'الكل',
+  'عام',
+  'شخصي',
+  'عمل',
+  'دراسة',
+  'مهام',
+  'أفكار',
+  'مشاريع'
+];
+
 function App() {
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notes')
@@ -301,6 +312,12 @@ function App() {
         bold: false,
         underline: false,
         color: getTheme().text
+      },
+      textStyle: {
+        bold: false,
+        underline: false,
+        align: 'right',
+        color: getTheme().text
       }
     })
     setIsEditing(false)
@@ -328,13 +345,25 @@ function App() {
 
     const noteToSave = {
       ...currentNote,
+      id: isEditing ? currentNote.id : Date.now(),
       date: new Date().toISOString(),
-      formattedDate: formatDate(new Date())
+      formattedDate: formatDate(new Date()),
+      titleStyle: currentNote.titleStyle || {
+        bold: false,
+        underline: false,
+        color: getTheme().text
+      },
+      textStyle: currentNote.textStyle || {
+        bold: false,
+        underline: false,
+        align: 'right',
+        color: getTheme().text
+      }
     }
 
     const updatedNotes = isEditing
       ? notes.map(note => (note.id === currentNote.id ? noteToSave : note))
-      : [...notes, { ...noteToSave, id: Date.now() }]
+      : [noteToSave, ...notes]
 
     setNotes(updatedNotes)
     localStorage.setItem('notes', JSON.stringify(updatedNotes))
@@ -348,6 +377,12 @@ function App() {
       titleStyle: {
         bold: false,
         underline: false,
+        color: getTheme().text
+      },
+      textStyle: {
+        bold: false,
+        underline: false,
+        align: 'right',
         color: getTheme().text
       }
     })
@@ -468,42 +503,14 @@ function App() {
   }, [darkMode, customThemeColor, fontSize, notes, categories])
 
   useEffect(() => {
-    searchNotes()
-  }, [searchTerm, selectedCategory, searchDate, notes])
-
-  const searchNotes = () => {
-    let filtered = [...notes]
-    
-    if (searchTerm) {
-      filtered = filtered.filter(note => 
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    if (selectedCategory !== 'الكل') {
-      filtered = filtered.filter(note => note.category === selectedCategory)
-    }
-
-    if (searchDate) {
-      filtered = filtered.filter(note => note.date?.includes(searchDate))
-    }
-
-    setFilteredNotes(filtered)
-  }
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
-        setShowSettings(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+    const filtered = notes.filter(note => {
+      const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           note.content.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'الكل' || note.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+    setFilteredNotes(filtered);
+  }, [searchTerm, selectedCategory, notes])
 
   const handleNoteClick = (note) => {
     setCurrentNote({
@@ -562,37 +569,30 @@ function App() {
               marginLeft: '10px'
             }}
           />
-          <input
-            type="text"
-            placeholder="ابحث في المذكرات..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              border: `1px solid ${getTheme().borderColor}`,
-              backgroundColor: getTheme().cardBg,
-              color: getTheme().text,
-              marginLeft: '10px'
-            }}
-          />
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            style={{
-              padding: '8px',
-              borderRadius: '4px',
-              border: `1px solid ${getTheme().borderColor}`,
-              backgroundColor: getTheme().cardBg,
-              color: getTheme().text,
-              marginLeft: '10px'
-            }}
-          >
-            <option value="الكل">كل التصنيفات</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+          <div className="search-container">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="ابحث في المذكرات..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+                dir="rtl"
+              />
+              <span className="search-icon">🔍</span>
+            </div>
+            <div className="categories-filter">
+              {CATEGORIES.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={() => fileInputRef.current.click()}
             style={{
@@ -670,7 +670,7 @@ function App() {
               إضافة مذكرة جديدة
             </button>
 
-            {(searchTerm || selectedCategory !== 'الكل' ? filteredNotes : notes).map(note => (
+            {filteredNotes.map(note => (
               <div
                 key={note.id}
                 className="note-card"
