@@ -117,6 +117,42 @@ function App() {
     }));
   };
 
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    requestAnimationFrame(() => {
+      setCurrentNote(prev => ({
+        ...prev,
+        title: value
+      }));
+    });
+  };
+
+  const handleQuickEmojiTitle = (emoji) => {
+    const cursorPosition = document.querySelector('.note-title-input').selectionStart;
+    const currentTitle = currentNote.title;
+    const newTitle = currentTitle.slice(0, cursorPosition) + emoji + currentTitle.slice(cursorPosition);
+    setCurrentNote(prev => ({
+      ...prev,
+      title: newTitle
+    }));
+  };
+
+  const handleEmojiSelect = (emojiData) => {
+    const emoji = emojiData.native;
+    if (document.activeElement.classList.contains('note-title-input')) {
+      handleQuickEmojiTitle(emoji);
+    } else {
+      const cursorPosition = document.querySelector('.note-content-textarea').selectionStart;
+      const currentContent = currentNote.content;
+      const newContent = currentContent.slice(0, cursorPosition) + emoji + currentContent.slice(cursorPosition);
+      setCurrentNote(prev => ({
+        ...prev,
+        content: newContent
+      }));
+    }
+    setShowEmojiPicker(false);
+  };
+
   const generateThemeFromColor = (color) => {
     return {
       light: {
@@ -287,14 +323,6 @@ function App() {
     setIsEditing(false)
   };
 
-  const handleEmojiSelect = (emoji) => {
-    setCurrentNote(prev => ({
-      ...prev,
-      content: prev.content + emoji.native
-    }))
-    setShowEmojiPicker(false)
-  }
-
   const handleDeleteNote = (noteId) => {
     if (window.confirm('هل أنت متأكد من حذف هذه المذكرة؟')) {
       try {
@@ -385,16 +413,6 @@ function App() {
       reader.readAsText(file)
     }
   }
-
-  const handleTitleChange = (e) => {
-    const value = e.target.value;
-    requestAnimationFrame(() => {
-      setCurrentNote(prev => ({
-        ...prev,
-        title: value
-      }));
-    });
-  };
 
   const handleContentChange = (e) => {
     const value = e.target.value;
@@ -755,7 +773,7 @@ function App() {
                 {QUICK_EMOJIS.map(item => (
                   <button
                     key={item.emoji}
-                    onClick={() => handleQuickEmoji(item.emoji)}
+                    onClick={() => handleQuickEmojiTitle(item.emoji)}
                     className="format-btn"
                     title={item.label}
                   >
