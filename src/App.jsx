@@ -136,39 +136,26 @@ function App() {
   };
 
   const handleTitleChange = (e) => {
-    const value = e.target.value;
-    requestAnimationFrame(() => {
-      setCurrentNote(prev => ({
-        ...prev,
-        title: value
-      }));
-    });
-  };
-
-  const handleQuickEmojiTitle = (emoji) => {
-    const cursorPosition = document.querySelector('.note-title-input').selectionStart;
-    const currentTitle = currentNote.title;
-    const newTitle = currentTitle.slice(0, cursorPosition) + emoji + currentTitle.slice(cursorPosition);
     setCurrentNote(prev => ({
       ...prev,
-      title: newTitle
+      title: e.target.value
     }));
   };
 
-  const handleEmojiSelect = (emojiData) => {
-    const emoji = emojiData.native || emojiData;
-    if (document.activeElement.classList.contains('note-title-input')) {
-      handleQuickEmojiTitle(emoji);
-    } else {
-      const cursorPosition = document.querySelector('.note-content-textarea').selectionStart;
-      const currentContent = currentNote.content;
-      const newContent = currentContent.slice(0, cursorPosition) + emoji + currentContent.slice(cursorPosition);
-      setCurrentNote(prev => ({
-        ...prev,
-        content: newContent
-      }));
-    }
-    setShowEmojiPicker(false);
+  const handleEmojiSelect = (emoji, color) => {
+    setCurrentNote(prev => ({
+      ...prev,
+      title: prev.title.startsWith('🎯') || prev.title.startsWith('⭐') || 
+             prev.title.startsWith('✨') || prev.title.startsWith('🌟') || 
+             prev.title.startsWith('💪') || prev.title.startsWith('🏆') || 
+             prev.title.startsWith('👍') || prev.title.startsWith('🎨') 
+        ? `${emoji} ${prev.title.substring(2)}` 
+        : `${emoji} ${prev.title}`,
+      titleStyle: {
+        ...prev.titleStyle,
+        color: color
+      }
+    }));
   };
 
   const generateThemeFromColor = (color) => {
@@ -772,54 +759,58 @@ function App() {
             setShowDialog(false)
           }
         }}>
-          <div className="dialog" style={{ backgroundColor: getTheme().cardBg }}>
-            <div className="title-section">
+          <div className="dialog" style={{ 
+            backgroundColor: getTheme().cardBg,
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '800px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div className="title-section" style={{ marginBottom: '1.5rem' }}>
               <input
                 type="text"
-                value={currentNote.title}
+                value={currentNote.title || ''}
                 onChange={handleTitleChange}
                 placeholder="عنوان المذكرة..."
                 dir="rtl"
                 style={{
                   width: '100%',
-                  padding: '10px',
-                  marginBottom: '10px',
+                  padding: '12px',
+                  marginBottom: '12px',
                   backgroundColor: getTheme().inputBg,
                   color: currentNote.titleStyle?.color || getTheme().text,
                   border: `1px solid ${getTheme().borderColor}`,
-                  borderRadius: '4px',
+                  borderRadius: '8px',
                   fontSize: '1.2rem',
                   fontWeight: currentNote.titleStyle?.bold ? 'bold' : 'normal',
                   textDecoration: currentNote.titleStyle?.underline ? 'underline' : 'none'
                 }}
               />
-              <div className="emoji-selector" style={{
+              <div style={{
                 display: 'flex',
                 gap: '0.5rem',
                 marginBottom: '1rem',
-                flexWrap: 'wrap'
+                flexWrap: 'wrap',
+                justifyContent: 'center'
               }}>
                 {TITLE_EMOJIS.map(item => (
                   <button
                     key={item.emoji}
-                    onClick={() => {
-                      setCurrentNote(prev => ({
-                        ...prev,
-                        title: `${item.emoji} ${prev.title}`,
-                        titleStyle: {
-                          ...prev.titleStyle,
-                          color: item.color
-                        }
-                      }));
-                    }}
+                    onClick={() => handleEmojiSelect(item.emoji, item.color)}
                     style={{
-                      padding: '0.5rem',
+                      padding: '0.75rem',
                       border: 'none',
-                      borderRadius: '4px',
+                      borderRadius: '8px',
                       backgroundColor: 'transparent',
                       cursor: 'pointer',
-                      fontSize: '1.2rem',
-                      transition: 'transform 0.2s',
+                      fontSize: '1.5rem',
+                      transition: 'all 0.2s ease',
+                      ':hover': {
+                        transform: 'scale(1.1)',
+                        backgroundColor: 'rgba(0,0,0,0.1)'
+                      }
                     }}
                     title={item.label}
                   >
