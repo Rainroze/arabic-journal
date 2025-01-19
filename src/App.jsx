@@ -85,7 +85,18 @@ function App() {
     title: '', 
     content: '', 
     backgroundColor: '#f3e5f5',
-    category: 'عام'
+    category: 'عام',
+    titleStyle: {
+      bold: false,
+      underline: false,
+      color: '#2c3e50'
+    },
+    textStyle: {
+      bold: false,
+      underline: false,
+      align: 'right',
+      color: '#2c3e50'
+    }
   })
   const [isEditing, setIsEditing] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -101,32 +112,25 @@ function App() {
   const fileInputRef = useRef(null)
   const settingsRef = useRef(null)
 
+  const [showColorMenu, setShowColorMenu] = useState(false);
+
   const [titleStyle, setTitleStyle] = useState({
     bold: false,
     underline: false,
     color: '#2c3e50'
   });
 
-  const [textStyle, setTextStyle] = useState({
-    bold: false,
-    underline: false,
-    align: 'right',
-    color: '#2c3e50'
-  });
-
-  const [showColorMenu, setShowColorMenu] = useState(false);
-
   const formatTitle = (style) => {
-    setTitleStyle(prev => ({
-      ...prev,
+    const newStyle = {
+      ...titleStyle,
       ...style
-    }));
-  };
-
-  const formatText = (style) => {
-    setTextStyle(prev => ({
+    };
+    setTitleStyle(newStyle);
+    
+    // تحديث المذكرة الحالية مع النمط الجديد
+    setCurrentNote(prev => ({
       ...prev,
-      ...style
+      titleStyle: newStyle
     }));
   };
 
@@ -296,13 +300,18 @@ function App() {
   };
 
   const handleAddClick = () => {
-    setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام' })
+    setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام', titleStyle: { bold: false, underline: false, color: '#2c3e50' }, textStyle: { bold: false, underline: false, align: 'right', color: '#2c3e50' } })
     setIsEditing(false)
     setShowDialog(true)
   }
 
   const handleEditClick = (note) => {
     setCurrentNote(note)
+    setTitleStyle(note.titleStyle || {
+      bold: false,
+      underline: false,
+      color: getTheme().text
+    })
     setIsEditing(true)
     setShowDialog(true)
   }
@@ -322,6 +331,7 @@ function App() {
 
     const noteToSave = {
       ...currentNote,
+      titleStyle,
       date: new Date().toISOString(),
       formattedDate: formatDate(new Date())
     }
@@ -331,6 +341,7 @@ function App() {
       : [...notes, { ...noteToSave, id: Date.now() }]
 
     setNotes(updatedNotes)
+    localStorage.setItem('notes', JSON.stringify(updatedNotes))
     setShowDialog(false)
     setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام' })
     setIsEditing(false)
@@ -486,6 +497,19 @@ function App() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const handleNoteClick = (note) => {
+    setCurrentNote({
+      ...note,
+    })
+    setTitleStyle(note.titleStyle || {
+      bold: false,
+      underline: false,
+      color: getTheme().text
+    })
+    setIsEditing(true)
+    setShowDialog(true)
+  }
 
   return (
     <div className={`app ${darkMode ? 'dark' : ''}`} style={{ 
@@ -675,7 +699,7 @@ function App() {
                   gap: '10px'
                 }}>
                   <button
-                    onClick={() => handleEditClick(note)}
+                    onClick={() => handleNoteClick(note)}
                     style={{
                       padding: '5px 10px',
                       backgroundColor: getTheme().buttonBg,
@@ -802,15 +826,27 @@ function App() {
             <div className="editor-toolbar">
               <div className="format-group">
                 <button
-                  className={`format-btn ${textStyle.bold ? 'active' : ''}`}
-                  onClick={() => formatText({ bold: !textStyle.bold })}
+                  className={`format-btn ${currentNote.textStyle.bold ? 'active' : ''}`}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      bold: !prev.textStyle.bold
+                    }
+                  }))}
                   title="خط عريض"
                 >
                   <span className="format-icon">B</span>
                 </button>
                 <button
-                  className={`format-btn ${textStyle.underline ? 'active' : ''}`}
-                  onClick={() => formatText({ underline: !textStyle.underline })}
+                  className={`format-btn ${currentNote.textStyle.underline ? 'active' : ''}`}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      underline: !prev.textStyle.underline
+                    }
+                  }))}
                   title="تسطير"
                 >
                   <span className="format-icon">U</span>
@@ -819,22 +855,40 @@ function App() {
 
               <div className="format-group">
                 <button
-                  className={`format-btn ${textStyle.align === 'right' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'right' })}
+                  className={`format-btn ${currentNote.textStyle.align === 'right' ? 'active' : ''}`}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      align: 'right'
+                    }
+                  }))}
                   title="محاذاة لليمين"
                 >
                   ⇚
                 </button>
                 <button
-                  className={`format-btn ${textStyle.align === 'center' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'center' })}
+                  className={`format-btn ${currentNote.textStyle.align === 'center' ? 'active' : ''}`}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      align: 'center'
+                    }
+                  }))}
                   title="توسيط"
                 >
                   ⇔
                 </button>
                 <button
-                  className={`format-btn ${textStyle.align === 'left' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'left' })}
+                  className={`format-btn ${currentNote.textStyle.align === 'left' ? 'active' : ''}`}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      align: 'left'
+                    }
+                  }))}
                   title="محاذاة لليسار"
                 >
                   ⇛
@@ -844,21 +898,39 @@ function App() {
               <div className="format-group">
                 <button
                   className="format-btn color-btn"
-                  onClick={() => formatText({ color: '#9C27B0' })}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      color: '#9C27B0'
+                    }
+                  }))}
                   title="لون بنفسجي"
                 >
                   <span className="color-circle purple"></span>
                 </button>
                 <button
                   className="format-btn color-btn"
-                  onClick={() => formatText({ color: '#2196F3' })}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      color: '#2196F3'
+                    }
+                  }))}
                   title="لون أزرق"
                 >
                   <span className="color-circle blue"></span>
                 </button>
                 <button
                   className="format-btn color-btn"
-                  onClick={() => formatText({ color: '#4CAF50' })}
+                  onClick={() => setCurrentNote(prev => ({
+                    ...prev,
+                    textStyle: {
+                      ...prev.textStyle,
+                      color: '#4CAF50'
+                    }
+                  }))}
                   title="لون أخضر"
                 >
                   <span className="color-circle green"></span>
@@ -910,11 +982,11 @@ function App() {
               autoComplete="off"
               style={{ 
                 backgroundColor: currentNote.backgroundColor,
-                color: textStyle.color,
-                fontWeight: textStyle.bold ? 'bold' : 'normal',
-                fontStyle: textStyle.italic ? 'italic' : 'normal',
-                textDecoration: textStyle.underline ? 'underline' : 'none',
-                textAlign: textStyle.align,
+                color: currentNote.textStyle.color,
+                fontWeight: currentNote.textStyle.bold ? 'bold' : 'normal',
+                fontStyle: currentNote.textStyle.italic ? 'italic' : 'normal',
+                textDecoration: currentNote.textStyle.underline ? 'underline' : 'none',
+                textAlign: currentNote.textStyle.align,
                 minHeight: '300px',
                 fontSize: getFontSize(fontSize),
                 fontFamily: 'Noto Sans Arabic, sans-serif'
