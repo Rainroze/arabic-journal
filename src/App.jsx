@@ -238,8 +238,8 @@ function App() {
       buttonBg: darkMode ? '#333333' : '#f0f0f0',
       buttonText: darkMode ? '#ffffff' : '#333333',
       borderColor: darkMode ? '#333333' : '#e0e0e0',
-      gradientStart: '#00796b',
-      gradientEnd: '#009688',
+      gradientStart: '#673AB7',
+      gradientEnd: '#9C27B0',
       headerText: '#ffffff',
       inputBg: darkMode ? '#333333' : '#ffffff',
     }
@@ -773,21 +773,61 @@ function App() {
           }
         }}>
           <div className="dialog" style={{ backgroundColor: getTheme().cardBg }}>
-            <input
-              type="text"
-              className="note-title-input"
-              value={currentNote.title}
-              onChange={handleTitleChange}
-              placeholder="عنوان المذكرة..."
-              dir="rtl"
-              autoComplete="off"
-              style={{ 
-                backgroundColor: currentNote.backgroundColor,
-                color: currentNote.titleStyle.color,
-                fontWeight: currentNote.titleStyle.bold ? 'bold' : 'normal',
-                textDecoration: currentNote.titleStyle.underline ? 'underline' : 'none'
-              }}
-            />
+            <div className="title-section">
+              <input
+                type="text"
+                value={currentNote.title}
+                onChange={handleTitleChange}
+                placeholder="عنوان المذكرة..."
+                dir="rtl"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  marginBottom: '10px',
+                  backgroundColor: getTheme().inputBg,
+                  color: currentNote.titleStyle?.color || getTheme().text,
+                  border: `1px solid ${getTheme().borderColor}`,
+                  borderRadius: '4px',
+                  fontSize: '1.2rem',
+                  fontWeight: currentNote.titleStyle?.bold ? 'bold' : 'normal',
+                  textDecoration: currentNote.titleStyle?.underline ? 'underline' : 'none'
+                }}
+              />
+              <div className="emoji-selector" style={{
+                display: 'flex',
+                gap: '0.5rem',
+                marginBottom: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                {TITLE_EMOJIS.map(item => (
+                  <button
+                    key={item.emoji}
+                    onClick={() => {
+                      setCurrentNote(prev => ({
+                        ...prev,
+                        title: `${item.emoji} ${prev.title}`,
+                        titleStyle: {
+                          ...prev.titleStyle,
+                          color: item.color
+                        }
+                      }));
+                    }}
+                    style={{
+                      padding: '0.5rem',
+                      border: 'none',
+                      borderRadius: '4px',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      transition: 'transform 0.2s',
+                    }}
+                    title={item.label}
+                  >
+                    {item.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="format-toolbar">
               <div className="format-group">
