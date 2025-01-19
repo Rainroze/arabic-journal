@@ -915,3 +915,57 @@ p {
   -o-transition: none !important;
   transition: none !important;
 }
+
+/* تنسيقات شريط الأدوات */
+.editor-toolbar {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 15px;
+}
+
+.toolbar-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  cursor: pointer;
+  font-family: 'Noto Sans Arabic', sans-serif;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background-color: var(--hover-color);
+  border-color: var(--primary-color);
+}
+
+.emoji-btn {
+  padding: 6px 8px;
+  font-size: 1.1em;
+}
+
+.emoji-picker-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background-color: var(--background-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+/* تحسين تنسيق الصور في المحتوى */
+.note-content-textarea img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 8px 0;
+}

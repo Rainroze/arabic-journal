@@ -671,6 +671,59 @@ function App() {
                 color: getTheme().text
               }}
             />
+
+            <div className="editor-toolbar" style={{ 
+              marginBottom: '10px',
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="toolbar-btn"
+                title="إضافة صورة"
+              >
+                🖼️ صورة
+              </button>
+              <button
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                className="toolbar-btn"
+                title="إضافة رموز تعبيرية"
+              >
+                😊 رموز
+              </button>
+              <div style={{ display: 'flex', gap: '8px', marginRight: 'auto' }}>
+                {QUICK_EMOJIS.map(item => (
+                  <button
+                    key={item.emoji}
+                    onClick={() => handleQuickEmoji(item.emoji)}
+                    className="toolbar-btn emoji-btn"
+                    title={item.label}
+                  >
+                    {item.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              style={{ display: 'none' }}
+            />
+
+            {showEmojiPicker && (
+              <div className="emoji-picker-container">
+                <EmojiPicker
+                  data={emojiData}
+                  onEmojiSelect={handleEmojiSelect}
+                  theme={darkMode ? 'dark' : 'light'}
+                />
+              </div>
+            )}
+
             <textarea
               value={currentNote.content}
               onChange={handleContentChange}
