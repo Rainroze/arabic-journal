@@ -739,34 +739,18 @@ function App() {
                 fontFamily: 'Noto Sans Arabic, sans-serif'
               }}
             />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1rem' }}>
+            <div className="dialog-buttons">
               <button
+                className="dialog-btn cancel-btn"
                 onClick={() => setShowDialog(false)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: darkMode ? '#404040' : '#e9ecef',
-                  color: getTheme().text,
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
               >
                 إلغاء
               </button>
               <button
+                className="dialog-btn save-btn"
                 onClick={handleSaveNote}
-                style={{
-                  padding: '10px 24px',
-                  backgroundColor: getTheme().buttonBg,
-                  color: getTheme().buttonText,
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
               >
-                حفظ
+                حفظ المذكرة
               </button>
             </div>
           </div>
