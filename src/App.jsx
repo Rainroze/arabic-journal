@@ -474,8 +474,15 @@ function App() {
     input.click()
   }
 
-  const renderNoteContent = (content) => {
-    return { __html: content }
+  const renderNoteContent = (note) => {
+    const textStyle = note.textStyle || {};
+    const styledContent = `<div style="
+      color: ${textStyle.color || getTheme().text};
+      font-weight: ${textStyle.bold ? 'bold' : 'normal'};
+      text-decoration: ${textStyle.underline ? 'underline' : 'none'};
+      text-align: ${textStyle.align || 'right'};
+    ">${note.content}</div>`;
+    return { __html: styledContent };
   }
 
   useEffect(() => {
@@ -674,7 +681,10 @@ function App() {
                 className="note-card"
                 style={{
                   backgroundColor: note.backgroundColor || '#f3e5f5',
-                  border: `1px solid ${getTheme().borderColor}`
+                  border: `1px solid ${getTheme().borderColor}`,
+                  padding: '15px',
+                  borderRadius: '8px',
+                  cursor: 'pointer'
                 }}
                 onClick={() => handleEditClick(note)}
               >
@@ -683,7 +693,8 @@ function App() {
                     style={{
                       color: note.titleStyle?.color || '#2c3e50',
                       fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
-                      textDecoration: note.titleStyle?.underline ? 'underline' : 'none'
+                      textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
+                      margin: '0 0 10px 0'
                     }}
                   >
                     {note.title}
@@ -691,7 +702,7 @@ function App() {
                   <span className="note-date">{note.formattedDate}</span>
                 </div>
                 <div className="note-content">
-                  <div dangerouslySetInnerHTML={renderNoteContent(note.content)} />
+                  <div dangerouslySetInnerHTML={renderNoteContent(note)} />
                 </div>
                 <div className="note-footer">
                   <span className="note-category">{note.category}</span>
@@ -915,7 +926,7 @@ function App() {
                   backgroundColor: getTheme().cardBg
                 }}
               >
-                <div dangerouslySetInnerHTML={renderNoteContent(currentNote.content)} />
+                <div dangerouslySetInnerHTML={renderNoteContent(currentNote)} />
               </div>
             </div>
 
