@@ -7,10 +7,14 @@ import Athkar from './components/Athkar'
 import Goals from './components/Goals'
 
 const QUICK_EMOJIS = [
-  { emoji: '❤️', label: 'قلب' },
-  { emoji: '✨', label: 'نجوم' },
-  { emoji: '🌟', label: 'نجمة' },
-  { emoji: '🎨', label: 'فن' }
+  { emoji: '🎯', label: 'هدف' },
+  { emoji: '⭐', label: 'نجمة' },
+  { emoji: '✨', label: 'تألق' },
+  { emoji: '🌟', label: 'نجم' },
+  { emoji: '💪', label: 'قوة' },
+  { emoji: '🏆', label: 'إنجاز' },
+  { emoji: '👍', label: 'رائع' },
+  { emoji: '🎨', label: 'إبداع' }
 ]
 
 const BACKGROUND_COLORS = [
@@ -759,16 +763,6 @@ function App() {
               </div>
 
               <div className="format-group">
-                <button
-                  onClick={() => {
-                    document.querySelector('.note-title-input').focus();
-                    setShowEmojiPicker(!showEmojiPicker);
-                  }}
-                  className="format-btn"
-                  title="إضافة رموز تعبيرية"
-                >
-                  😊
-                </button>
                 {QUICK_EMOJIS.map(item => (
                   <button
                     key={item.emoji}
