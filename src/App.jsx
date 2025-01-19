@@ -446,6 +446,35 @@ function App() {
     });
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    try {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const img = `<img src="${reader.result}" alt="صورة" style="max-width: 100%; height: auto; margin: 10px 0;" />`
+        const newContent = currentNote.content + img
+        setCurrentNote(prev => ({
+          ...prev,
+          content: newContent
+        }))
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('خطأ في تحميل الصورة:', error)
+      alert('حدث خطأ أثناء تحميل الصورة')
+    }
+  }
+
+  const handleAddImage = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = handleImageUpload
+    input.click()
+  }
+
   useEffect(() => {
     try {
       localStorage.setItem('darkMode', JSON.stringify(darkMode))
@@ -649,7 +678,7 @@ function App() {
                   <span className="note-date">{note.formattedDate}</span>
                 </div>
                 <div className="note-content">
-                  <p>{note.content}</p>
+                  <div dangerouslySetInnerHTML={{ __html: note.content }} />
                 </div>
                 <div className="note-footer">
                   <span className="note-category">{note.category}</span>
@@ -850,7 +879,7 @@ function App() {
 
               <div className="format-group">
                 <button
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={handleAddImage}
                   className="format-btn"
                   title="إضافة صورة"
                 >
@@ -869,7 +898,7 @@ function App() {
             <input
               type="file"
               ref={fileInputRef}
-              onChange={handleFileChange}
+              onChange={handleImageUpload}
               accept="image/*"
               style={{ display: 'none' }}
             />
