@@ -93,7 +93,6 @@ function App() {
   })
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('الكل')
 
   const [customThemeColor, setCustomThemeColor] = useState(() => {
     const saved = localStorage.getItem('customThemeColor')
@@ -117,7 +116,10 @@ function App() {
   const [showAthkar, setShowAthkar] = useState(false)
   const [showGoals, setShowGoals] = useState(false)
   const [searchDate, setSearchDate] = useState('')
-  const [filteredNotes, setFilteredNotes] = useState([])
+  const filteredNotes = notes.filter(note => {
+    return note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           note.content.toLowerCase().includes(searchTerm.toLowerCase());
+  });
   const fileInputRef = useRef(null)
   const settingsRef = useRef(null)
 
@@ -395,7 +397,7 @@ function App() {
 
   const exportNotes = () => {
     try {
-      const notesToExport = searchTerm || selectedCategory !== 'الكل' ? filteredNotes : notes
+      const notesToExport = filteredNotes
       const exportData = {
         notes: notesToExport,
         categories: categories,
@@ -497,16 +499,6 @@ function App() {
     }
   }, [darkMode, customThemeColor, fontSize, notes, categories])
 
-  useEffect(() => {
-    const filtered = notes.filter(note => {
-      const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           note.content.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'الكل' || note.category === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-    setFilteredNotes(filtered);
-  }, [searchTerm, selectedCategory, notes])
-
   const handleNoteClick = (note) => {
     setCurrentNote({
       ...note,
@@ -585,17 +577,6 @@ function App() {
                 dir="rtl"
               />
               <span className="search-icon">🔍</span>
-            </div>
-            <div className="categories-filter">
-              {CATEGORIES.map(category => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`category-btn ${selectedCategory === category ? 'active' : ''}`}
-                >
-                  {category}
-                </button>
-              ))}
             </div>
           </div>
           <button
