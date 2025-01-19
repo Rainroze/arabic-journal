@@ -90,6 +90,35 @@ function App() {
   const fileInputRef = useRef(null)
   const settingsRef = useRef(null)
 
+  const [titleStyle, setTitleStyle] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    color: '#2c3e50'
+  });
+
+  const [textStyle, setTextStyle] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    align: 'right',
+    color: '#2c3e50'
+  });
+
+  const formatTitle = (style) => {
+    setTitleStyle(prev => ({
+      ...prev,
+      ...style
+    }));
+  };
+
+  const formatText = (style) => {
+    setTextStyle(prev => ({
+      ...prev,
+      ...style
+    }));
+  };
+
   const generateThemeFromColor = (color) => {
     return {
       light: {
@@ -668,41 +697,151 @@ function App() {
               autoComplete="off"
               style={{ 
                 backgroundColor: currentNote.backgroundColor,
-                color: getTheme().text
+                color: titleStyle.color,
+                fontWeight: titleStyle.bold ? 'bold' : 'normal',
+                fontStyle: titleStyle.italic ? 'italic' : 'normal',
+                textDecoration: titleStyle.underline ? 'underline' : 'none'
               }}
             />
 
-            <div className="editor-toolbar" style={{ 
-              marginBottom: '10px',
-              display: 'flex',
-              gap: '10px',
-              flexWrap: 'wrap'
-            }}>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="toolbar-btn"
-                title="إضافة صورة"
-              >
-                🖼️ صورة
-              </button>
-              <button
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="toolbar-btn"
-                title="إضافة رموز تعبيرية"
-              >
-                😊 رموز
-              </button>
-              <div style={{ display: 'flex', gap: '8px', marginRight: 'auto' }}>
-                {QUICK_EMOJIS.map(item => (
-                  <button
-                    key={item.emoji}
-                    onClick={() => handleQuickEmoji(item.emoji)}
-                    className="toolbar-btn emoji-btn"
-                    title={item.label}
-                  >
-                    {item.emoji}
-                  </button>
-                ))}
+            <div className="format-toolbar">
+              <div className="format-group">
+                <button
+                  className={`format-btn ${titleStyle.bold ? 'active' : ''}`}
+                  onClick={() => formatTitle({ bold: !titleStyle.bold })}
+                  title="خط عريض"
+                >
+                  <span className="format-icon">B</span>
+                </button>
+                <button
+                  className={`format-btn ${titleStyle.italic ? 'active' : ''}`}
+                  onClick={() => formatTitle({ italic: !titleStyle.italic })}
+                  title="خط مائل"
+                >
+                  <span className="format-icon">I</span>
+                </button>
+                <button
+                  className={`format-btn ${titleStyle.underline ? 'active' : ''}`}
+                  onClick={() => formatTitle({ underline: !titleStyle.underline })}
+                  title="تسطير"
+                >
+                  <span className="format-icon">U</span>
+                </button>
+              </div>
+
+              <div className="format-group">
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatTitle({ color: '#9C27B0' })}
+                  title="لون بنفسجي"
+                >
+                  <span className="color-circle purple"></span>
+                </button>
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatTitle({ color: '#2196F3' })}
+                  title="لون أزرق"
+                >
+                  <span className="color-circle blue"></span>
+                </button>
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatTitle({ color: '#4CAF50' })}
+                  title="لون أخضر"
+                >
+                  <span className="color-circle green"></span>
+                </button>
+              </div>
+            </div>
+
+            <div className="editor-toolbar">
+              <div className="format-group">
+                <button
+                  className={`format-btn ${textStyle.bold ? 'active' : ''}`}
+                  onClick={() => formatText({ bold: !textStyle.bold })}
+                  title="خط عريض"
+                >
+                  <span className="format-icon">B</span>
+                </button>
+                <button
+                  className={`format-btn ${textStyle.italic ? 'active' : ''}`}
+                  onClick={() => formatText({ italic: !textStyle.italic })}
+                  title="خط مائل"
+                >
+                  <span className="format-icon">I</span>
+                </button>
+                <button
+                  className={`format-btn ${textStyle.underline ? 'active' : ''}`}
+                  onClick={() => formatText({ underline: !textStyle.underline })}
+                  title="تسطير"
+                >
+                  <span className="format-icon">U</span>
+                </button>
+              </div>
+
+              <div className="format-group">
+                <button
+                  className={`format-btn ${textStyle.align === 'right' ? 'active' : ''}`}
+                  onClick={() => formatText({ align: 'right' })}
+                  title="محاذاة لليمين"
+                >
+                  ⇚
+                </button>
+                <button
+                  className={`format-btn ${textStyle.align === 'center' ? 'active' : ''}`}
+                  onClick={() => formatText({ align: 'center' })}
+                  title="توسيط"
+                >
+                  ⇔
+                </button>
+                <button
+                  className={`format-btn ${textStyle.align === 'left' ? 'active' : ''}`}
+                  onClick={() => formatText({ align: 'left' })}
+                  title="محاذاة لليسار"
+                >
+                  ⇛
+                </button>
+              </div>
+
+              <div className="format-group">
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatText({ color: '#9C27B0' })}
+                  title="لون بنفسجي"
+                >
+                  <span className="color-circle purple"></span>
+                </button>
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatText({ color: '#2196F3' })}
+                  title="لون أزرق"
+                >
+                  <span className="color-circle blue"></span>
+                </button>
+                <button
+                  className="format-btn color-btn"
+                  onClick={() => formatText({ color: '#4CAF50' })}
+                  title="لون أخضر"
+                >
+                  <span className="color-circle green"></span>
+                </button>
+              </div>
+
+              <div className="format-group">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="format-btn"
+                  title="إضافة صورة"
+                >
+                  🖼️
+                </button>
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="format-btn"
+                  title="إضافة رموز تعبيرية"
+                >
+                  😊
+                </button>
               </div>
             </div>
 
@@ -733,7 +872,11 @@ function App() {
               autoComplete="off"
               style={{ 
                 backgroundColor: currentNote.backgroundColor,
-                color: getTheme().text,
+                color: textStyle.color,
+                fontWeight: textStyle.bold ? 'bold' : 'normal',
+                fontStyle: textStyle.italic ? 'italic' : 'normal',
+                textDecoration: textStyle.underline ? 'underline' : 'none',
+                textAlign: textStyle.align,
                 minHeight: '300px',
                 fontSize: getFontSize(fontSize),
                 fontFamily: 'Noto Sans Arabic, sans-serif'
