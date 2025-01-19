@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- خلفية دائرية متدرجة -->
-  <circle cx="256" cy="256" r="256" fill="url(#gradient)"/>
+  <!-- خلفية مستطيلة مع حواف دائرية -->
+  <rect width="512" height="512" rx="128" fill="#2196F3"/>
   
-  <!-- كتاب مفتوح -->
-  <path d="M156 156C156 144.954 164.954 136 176 136H336C347.046 136 356 144.954 356 156V356C356 367.046 347.046 376 336 376H176C164.954 376 156 367.046 156 356V156Z" fill="white"/>
+  <!-- تأثير الظل للدفتر -->
+  <rect x="96" y="76" width="320" height="360" rx="24" fill="#1E88E5"/>
   
-  <!-- خطوط الكتاب -->
-  <path d="M196 196H316" stroke="#9C27B0" stroke-width="16" stroke-linecap="round"/>
-  <path d="M196 236H316" stroke="#9C27B0" stroke-width="16" stroke-linecap="round"/>
-  <path d="M196 276H266" stroke="#9C27B0" stroke-width="16" stroke-linecap="round"/>
+  <!-- الدفتر الرئيسي -->
+  <rect x="86" y="66" width="320" height="360" rx="24" fill="white"/>
   
-  <!-- نجمة إسلامية -->
-  <path d="M256 96L276 136L316 146L286 176L296 216L256 196L216 216L226 176L196 146L236 136L256 96Z" fill="#BA68C8"/>
+  <!-- خطوط الدفتر -->
+  <rect x="106" y="96" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="146" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="196" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="246" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="296" width="280" height="2" fill="#E3F2FD"/>
+  <rect x="106" y="346" width="280" height="2" fill="#E3F2FD"/>
   
-  <!-- تدرج لوني للخلفية -->
-  <defs>
-    <linearGradient id="gradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" style="stop-color:#9C27B0"/>
-      <stop offset="100%" style="stop-color:#BA68C8"/>
-    </linearGradient>
-  </defs>
+  <!-- حلقات الدفتر -->
+  <circle cx="106" cy="96" r="8" fill="#FF4081"/>
+  <circle cx="106" cy="196" r="8" fill="#FF4081"/>
+  <circle cx="106" cy="296" r="8" fill="#FF4081"/>
+  
+  <!-- القلم -->
+  <path d="M386 156L356 186L326 366L356 386L386 366L356 186L386 156Z" fill="#FF4081"/>
+  <path d="M386 156L356 126L326 156L356 186L386 156Z" fill="#F50057"/>
+  
+  <!-- علامات التبويب الملونة -->
+  <rect x="380" y="106" width="40" height="60" rx="8" fill="#FF4081"/>
+  <rect x="380" y="176" width="40" height="60" rx="8" fill="#FFC107"/>
+  <rect x="380" y="246" width="40" height="60" rx="8" fill="#4CAF50"/>
 </svg>
