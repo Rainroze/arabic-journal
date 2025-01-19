@@ -6,16 +6,27 @@ import 'moment/locale/ar-sa'
 import Athkar from './components/Athkar'
 import Goals from './components/Goals'
 
-const QUICK_EMOJIS = [
-  { emoji: '🎯', label: 'هدف' },
-  { emoji: '⭐', label: 'نجمة' },
-  { emoji: '✨', label: 'تألق' },
-  { emoji: '🌟', label: 'نجم' },
-  { emoji: '💪', label: 'قوة' },
-  { emoji: '🏆', label: 'إنجاز' },
-  { emoji: '👍', label: 'رائع' },
-  { emoji: '🎨', label: 'إبداع' }
-]
+const TITLE_EMOJIS = [
+  { emoji: '🎯', label: 'هدف', color: '#9C27B0' },
+  { emoji: '⭐', label: 'نجمة', color: '#2196F3' },
+  { emoji: '✨', label: 'تألق', color: '#4CAF50' },
+  { emoji: '🌟', label: 'نجم', color: '#FF9800' },
+  { emoji: '💪', label: 'قوة', color: '#E91E63' },
+  { emoji: '🏆', label: 'إنجاز', color: '#673AB7' },
+  { emoji: '👍', label: 'رائع', color: '#03A9F4' },
+  { emoji: '🎨', label: 'إبداع', color: '#009688' }
+];
+
+const COLOR_PALETTE = [
+  { color: '#9C27B0', label: 'بنفسجي' },
+  { color: '#2196F3', label: 'أزرق' },
+  { color: '#4CAF50', label: 'أخضر' },
+  { color: '#FF9800', label: 'برتقالي' },
+  { color: '#E91E63', label: 'وردي' },
+  { color: '#673AB7', label: 'أرجواني' },
+  { color: '#03A9F4', label: 'سماوي' },
+  { color: '#009688', label: 'فيروزي' }
+];
 
 const BACKGROUND_COLORS = [
   { label: 'بنفسجي فاتح', value: '#f3e5f5' },
@@ -738,37 +749,30 @@ function App() {
                 </button>
               </div>
 
-              <div className="format-group">
-                <button
-                  className="format-btn color-btn"
-                  onClick={() => formatTitle({ color: '#9C27B0' })}
-                  title="لون بنفسجي"
-                >
-                  <span className="color-circle purple"></span>
-                </button>
-                <button
-                  className="format-btn color-btn"
-                  onClick={() => formatTitle({ color: '#2196F3' })}
-                  title="لون أزرق"
-                >
-                  <span className="color-circle blue"></span>
-                </button>
-                <button
-                  className="format-btn color-btn"
-                  onClick={() => formatTitle({ color: '#4CAF50' })}
-                  title="لون أخضر"
-                >
-                  <span className="color-circle green"></span>
-                </button>
+              <div className="format-group colors-group">
+                {COLOR_PALETTE.map(item => (
+                  <button
+                    key={item.color}
+                    className="format-btn color-btn"
+                    onClick={() => formatTitle({ color: item.color })}
+                    title={item.label}
+                  >
+                    <span className="color-circle" style={{ backgroundColor: item.color }}></span>
+                  </button>
+                ))}
               </div>
 
-              <div className="format-group">
-                {QUICK_EMOJIS.map(item => (
+              <div className="format-group emojis-group">
+                {TITLE_EMOJIS.map(item => (
                   <button
                     key={item.emoji}
                     onClick={() => handleQuickEmojiTitle(item.emoji)}
-                    className="format-btn"
+                    className="format-btn emoji-btn"
                     title={item.label}
+                    style={{ 
+                      color: item.color,
+                      borderColor: item.color
+                    }}
                   >
                     {item.emoji}
                   </button>

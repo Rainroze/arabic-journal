@@ -1202,3 +1202,110 @@ p {
   border-color: var(--primary-color) !important;
   box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3) !important;
 }
+
+/* تنسيق مجموعات الأزرار */
+.format-group {
+  display: flex !important;
+  gap: 6px !important;
+  padding: 4px 12px !important;
+  border-left: 2px solid var(--border-color) !important;
+  position: relative !important;
+}
+
+.colors-group {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 4px !important;
+}
+
+.emojis-group {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 4px !important;
+}
+
+.format-group:last-child {
+  border-left: none !important;
+  padding-left: 0 !important;
+}
+
+/* تنسيق الأزرار */
+.format-btn {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 10px !important;
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.1em !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.format-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.format-btn.active {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.2) !important;
+}
+
+/* تنسيق أزرار الإيموجي */
+.emoji-btn {
+  font-size: 1.3em !important;
+  background-color: var(--background-color) !important;
+  transition: all 0.2s ease !important;
+}
+
+.emoji-btn:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-width: 2px !important;
+}
+
+/* تنسيق أزرار الألوان */
+.color-btn {
+  padding: 4px !important;
+}
+
+.color-circle {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--border-color) !important;
+  transition: all 0.2s ease !important;
+}
+
+.color-btn:hover .color-circle {
+  transform: scale(1.1) !important;
+  border-color: currentColor !important;
+}
+
+/* تحسين المظهر في الوضع المظلم */
+[data-theme="dark"] .format-toolbar,
+[data-theme="dark"] .editor-toolbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .format-btn {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .format-btn:hover {
+  background-color: var(--hover-color) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .emoji-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
