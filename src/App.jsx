@@ -231,8 +231,18 @@ function App() {
   }
 
   const getTheme = () => {
-    const theme = generateThemeFromColor(customThemeColor)
-    return darkMode ? theme.dark : theme.light
+    return {
+      background: darkMode ? '#121212' : '#f5f5f5',
+      text: darkMode ? '#ffffff' : '#333333',
+      cardBg: darkMode ? '#1e1e1e' : '#ffffff',
+      buttonBg: darkMode ? '#333333' : '#f0f0f0',
+      buttonText: darkMode ? '#ffffff' : '#333333',
+      borderColor: darkMode ? '#333333' : '#e0e0e0',
+      gradientStart: '#00796b',
+      gradientEnd: '#009688',
+      headerText: '#ffffff',
+      inputBg: darkMode ? '#333333' : '#ffffff',
+    }
   }
 
   const handleFileChange = async (e) => {
@@ -518,77 +528,150 @@ function App() {
   };
 
   return (
-    <div className={`app ${darkMode ? 'dark' : ''}`} style={{ 
+    <div className="app" style={{ 
       backgroundColor: getTheme().background,
       color: getTheme().text,
-      fontSize: getFontSize(fontSize)
+      minHeight: '100vh',
+      transition: 'all 0.3s ease'
     }}>
       <header style={{
-        width: '100%',
-        background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
-        padding: '1.5rem',
-        borderRadius: 'var(--border-radius)',
-        marginBottom: 'var(--grid-gap)',
-        color: getTheme().headerText,
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: '1rem 2rem',
+        background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000
       }}>
-        <div className="header-buttons">
-          <button
-            onClick={() => setShowGoals(true)}
-            style={{ backgroundColor: getTheme().buttonBg, color: getTheme().buttonText }}
-          >
-            أهدافي
-          </button>
-          <button
-            onClick={() => setShowAthkar(true)}
-            style={{ backgroundColor: getTheme().buttonBg, color: getTheme().buttonText }}
-          >
-            الأذكار
-          </button>
-          <button onClick={toggleDarkMode}>
-            {darkMode ? '🌞' : '🌙'}
-          </button>
-          <button onClick={() => setShowSettings(true)}>
-            ⚙️
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <input
             type="date"
             value={searchDate}
             onChange={(e) => setSearchDate(e.target.value)}
             style={{
-              padding: '8px',
-              borderRadius: '4px',
-              border: `1px solid ${getTheme().borderColor}`,
-              backgroundColor: getTheme().cardBg,
-              color: getTheme().text,
-              marginLeft: '10px'
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '0.5rem 1rem',
+              color: 'white',
+              fontSize: '0.9rem'
             }}
           />
-          <div className="search-container">
-            <div className="search-box">
-              <input
-                type="text"
-                placeholder="ابحث في المذكرات..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-                dir="rtl"
-              />
-              <span className="search-icon">🔍</span>
-            </div>
-          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            ⚙️
+          </button>
+          <button
+            onClick={() => setShowAthkar(!showAthkar)}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            📿
+          </button>
+        </div>
+      </header>
+
+      <main style={{ padding: '2rem' }}>
+        <div style={{ 
+          maxWidth: '600px', 
+          margin: '0 auto 2rem',
+          position: 'relative' 
+        }}>
+          <input
+            type="text"
+            placeholder="ابحث في المذكرات..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '1rem 3rem',
+              border: 'none',
+              borderRadius: '12px',
+              backgroundColor: getTheme().cardBg,
+              color: getTheme().text,
+              fontSize: '1rem',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease',
+              textAlign: 'right'
+            }}
+          />
+          <span style={{
+            position: 'absolute',
+            left: '1rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            fontSize: '1.2rem',
+            opacity: 0.6
+          }}>
+            🔍
+          </span>
+        </div>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '1rem',
+          margin: '2rem 0' 
+        }}>
           <button
             onClick={() => fileInputRef.current.click()}
             style={{
-              padding: '8px 16px',
-              borderRadius: '4px',
-              backgroundColor: getTheme().buttonBg,
-              color: getTheme().buttonText,
+              padding: '0.75rem 2rem',
               border: 'none',
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
+              color: 'white',
+              fontWeight: '500',
               cursor: 'pointer',
-              marginLeft: '10px'
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
           >
             استيراد
@@ -596,101 +679,88 @@ function App() {
           <button
             onClick={exportNotes}
             style={{
-              padding: '8px 16px',
-              borderRadius: '4px',
-              backgroundColor: getTheme().buttonBg,
-              color: getTheme().buttonText,
+              padding: '0.75rem 2rem',
               border: 'none',
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
+              color: 'white',
+              fontWeight: '500',
               cursor: 'pointer',
-              marginLeft: '10px'
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
           >
             تصدير
           </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={importNotes}
-            accept=".json"
-            style={{ display: 'none' }}
-          />
         </div>
-      </header>
 
-      <main>
-        <div className="content">
-          <h1 style={{ margin: 0, fontSize: '2rem', fontWeight: 'bold' }}>
-            مذكراتي
-          </h1>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '2rem',
+          padding: '2rem',
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}>
+          <button 
+            className="add-note-button" 
+            onClick={handleAddClick}
+            style={{
+              backgroundColor: getTheme().buttonBg,
+              color: getTheme().buttonText,
+              border: 'none',
+              borderRadius: '12px',
+              padding: '2rem',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem',
+              height: '200px',
+              justifyContent: 'center'
+            }}
+          >
+            <span style={{ fontSize: '2rem' }}>✏️</span>
+            إضافة مذكرة جديدة
+          </button>
 
-          <div className="notes-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '2rem',
-            padding: '2rem',
-            maxWidth: '1400px',
-            margin: '0 auto'
-          }}>
-            <button 
-              className="add-note-button" 
-              onClick={handleAddClick}
+          {filteredNotes.map(note => (
+            <div
+              key={note.id}
+              className="note-card"
               style={{
-                backgroundColor: getTheme().buttonBg,
-                color: getTheme().buttonText,
-                border: 'none',
-                borderRadius: '12px',
-                padding: '2rem',
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '1rem',
-                height: '200px',
-                justifyContent: 'center'
+                backgroundColor: note.backgroundColor || '#f3e5f5',
+                border: `1px solid ${getTheme().borderColor}`,
+                padding: '15px',
+                borderRadius: '8px',
+                cursor: 'pointer'
               }}
+              onClick={() => handleEditClick(note)}
             >
-              <span style={{ fontSize: '2rem' }}>✏️</span>
-              إضافة مذكرة جديدة
-            </button>
-
-            {filteredNotes.map(note => (
-              <div
-                key={note.id}
-                className="note-card"
-                style={{
-                  backgroundColor: note.backgroundColor || '#f3e5f5',
-                  border: `1px solid ${getTheme().borderColor}`,
-                  padding: '15px',
-                  borderRadius: '8px',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleEditClick(note)}
-              >
-                <div className="note-header">
-                  <h3
-                    style={{
-                      color: note.titleStyle?.color || '#2c3e50',
-                      fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
-                      textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
-                      margin: '0 0 10px 0'
-                    }}
-                  >
-                    {note.title}
-                  </h3>
-                  <span className="note-date">{note.formattedDate}</span>
-                </div>
-                <div className="note-content">
-                  <div dangerouslySetInnerHTML={renderNoteContent(note)} />
-                </div>
-                <div className="note-footer">
-                  <span className="note-category">{note.category}</span>
-                </div>
+              <div className="note-header">
+                <h3
+                  style={{
+                    color: note.titleStyle?.color || '#2c3e50',
+                    fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
+                    textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
+                    margin: '0 0 10px 0'
+                  }}
+                >
+                  {note.title}
+                </h3>
+                <span className="note-date">{note.formattedDate}</span>
               </div>
-            ))}
-          </div>
+              <div className="note-content">
+                <div dangerouslySetInnerHTML={renderNoteContent(note)} />
+              </div>
+              <div className="note-footer">
+                <span className="note-category">{note.category}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
 
