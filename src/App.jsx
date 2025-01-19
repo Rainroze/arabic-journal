@@ -116,6 +116,7 @@ function App() {
   const [showAthkar, setShowAthkar] = useState(false)
   const [showGoals, setShowGoals] = useState(false)
   const [searchDate, setSearchDate] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const filteredNotes = notes.filter(note => {
     return note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
            note.content.toLowerCase().includes(searchTerm.toLowerCase());
@@ -344,16 +345,13 @@ function App() {
     setIsEditing(false)
   };
 
-  const handleDeleteNote = (noteId) => {
-    if (window.confirm('هل أنت متأكد من حذف هذه المذكرة؟')) {
-      try {
-        setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId))
-      } catch (error) {
-        console.error('خطأ في حذف المذكرة:', error)
-        alert('حدث خطأ في حذف المذكرة')
-      }
-    }
-  }
+  const handleDeleteNote = () => {
+    const updatedNotes = notes.filter(note => note.id !== currentNote.id);
+    setNotes(updatedNotes);
+    localStorage.setItem('notes', JSON.stringify(updatedNotes));
+    setShowDialog(false);
+    setShowDeleteConfirm(false);
+  };
 
   const toggleDarkMode = () => {
     setDarkMode(prev => !prev)
@@ -1040,18 +1038,126 @@ function App() {
               </div>
             </div>
 
-            <div className="dialog-buttons">
+            <div style={{ 
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '2rem',
+              gap: '1rem'
+            }}>
               <button
-                className="dialog-btn cancel-btn"
+                onClick={() => setShowDeleteConfirm(true)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '1rem',
+                  ':hover': {
+                    backgroundColor: '#c82333'
+                  }
+                }}
+              >
+                🗑️ حذف المذكرة
+              </button>
+              <button
                 onClick={() => setShowDialog(false)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: getTheme().buttonBg,
+                  color: getTheme().buttonText,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '1rem'
+                }}
               >
                 إلغاء
               </button>
               <button
-                className="dialog-btn save-btn"
                 onClick={handleSaveNote}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: getTheme().buttonBg,
+                  color: getTheme().buttonText,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '1rem'
+                }}
               >
-                حفظ المذكرة
+                حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1100
+        }}>
+          <div style={{
+            backgroundColor: getTheme().cardBg,
+            padding: '2rem',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ marginBottom: '1rem', color: getTheme().text }}>
+              هل أنت متأكد من حذف هذه المذكرة؟
+            </h3>
+            <p style={{ marginBottom: '2rem', color: getTheme().text, opacity: 0.8 }}>
+              لا يمكن التراجع عن هذا الإجراء
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button
+                onClick={handleDeleteNote}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '1rem',
+                  ':hover': {
+                    backgroundColor: '#c82333'
+                  }
+                }}
+              >
+                نعم، احذف المذكرة
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: getTheme().buttonBg,
+                  color: getTheme().buttonText,
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '1rem'
+                }}
+              >
+                إلغاء
               </button>
             </div>
           </div>
