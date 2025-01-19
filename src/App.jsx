@@ -82,6 +82,7 @@ function App() {
   
   const [showDialog, setShowDialog] = useState(false)
   const [currentNote, setCurrentNote] = useState({ 
+    id: '',
     title: '', 
     content: '', 
     backgroundColor: '#f3e5f5',
@@ -114,23 +115,13 @@ function App() {
 
   const [showColorMenu, setShowColorMenu] = useState(false);
 
-  const [titleStyle, setTitleStyle] = useState({
-    bold: false,
-    underline: false,
-    color: '#2c3e50'
-  });
-
   const formatTitle = (style) => {
-    const newStyle = {
-      ...titleStyle,
-      ...style
-    };
-    setTitleStyle(newStyle);
-    
-    // تحديث المذكرة الحالية مع النمط الجديد
     setCurrentNote(prev => ({
       ...prev,
-      titleStyle: newStyle
+      titleStyle: {
+        ...prev.titleStyle,
+        ...style
+      }
     }));
   };
 
@@ -300,18 +291,24 @@ function App() {
   };
 
   const handleAddClick = () => {
-    setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام', titleStyle: { bold: false, underline: false, color: '#2c3e50' }, textStyle: { bold: false, underline: false, align: 'right', color: '#2c3e50' } })
+    setCurrentNote({
+      id: '',
+      title: '',
+      content: '',
+      backgroundColor: '#f3e5f5',
+      category: 'عام',
+      titleStyle: {
+        bold: false,
+        underline: false,
+        color: getTheme().text
+      }
+    })
     setIsEditing(false)
     setShowDialog(true)
   }
 
   const handleEditClick = (note) => {
     setCurrentNote(note)
-    setTitleStyle(note.titleStyle || {
-      bold: false,
-      underline: false,
-      color: getTheme().text
-    })
     setIsEditing(true)
     setShowDialog(true)
   }
@@ -331,7 +328,6 @@ function App() {
 
     const noteToSave = {
       ...currentNote,
-      titleStyle,
       date: new Date().toISOString(),
       formattedDate: formatDate(new Date())
     }
@@ -343,7 +339,18 @@ function App() {
     setNotes(updatedNotes)
     localStorage.setItem('notes', JSON.stringify(updatedNotes))
     setShowDialog(false)
-    setCurrentNote({ title: '', content: '', backgroundColor: '#f3e5f5', category: 'عام' })
+    setCurrentNote({
+      id: '',
+      title: '',
+      content: '',
+      backgroundColor: '#f3e5f5',
+      category: 'عام',
+      titleStyle: {
+        bold: false,
+        underline: false,
+        color: getTheme().text
+      }
+    })
     setIsEditing(false)
   };
 
@@ -501,11 +508,6 @@ function App() {
   const handleNoteClick = (note) => {
     setCurrentNote({
       ...note,
-    })
-    setTitleStyle(note.titleStyle || {
-      bold: false,
-      underline: false,
-      color: getTheme().text
     })
     setIsEditing(true)
     setShowDialog(true)
@@ -742,40 +744,39 @@ function App() {
           <div className="dialog" style={{ backgroundColor: getTheme().cardBg }}>
             <input
               type="text"
-              placeholder="عنوان المذكرة..."
+              className="note-title-input"
               value={currentNote.title}
               onChange={handleTitleChange}
-              className="note-title-input"
+              placeholder="عنوان المذكرة..."
               dir="rtl"
               autoComplete="off"
               style={{ 
                 backgroundColor: currentNote.backgroundColor,
-                color: titleStyle.color,
-                fontWeight: titleStyle.bold ? 'bold' : 'normal',
-                fontStyle: titleStyle.italic ? 'italic' : 'normal',
-                textDecoration: titleStyle.underline ? 'underline' : 'none'
+                color: currentNote.titleStyle.color,
+                fontWeight: currentNote.titleStyle.bold ? 'bold' : 'normal',
+                textDecoration: currentNote.titleStyle.underline ? 'underline' : 'none'
               }}
             />
 
             <div className="format-toolbar">
               <div className="format-group">
                 <button
-                  className={`format-btn ${titleStyle.bold ? 'active' : ''}`}
-                  onClick={() => formatTitle({ bold: !titleStyle.bold })}
+                  className={`format-btn ${currentNote.titleStyle.bold ? 'active' : ''}`}
+                  onClick={() => formatTitle({ bold: !currentNote.titleStyle.bold })}
                   title="خط عريض"
                 >
                   <span className="format-icon">B</span>
                 </button>
                 <button
-                  className={`format-btn ${titleStyle.underline ? 'active' : ''}`}
-                  onClick={() => formatTitle({ underline: !titleStyle.underline })}
+                  className={`format-btn ${currentNote.titleStyle.underline ? 'active' : ''}`}
+                  onClick={() => formatTitle({ underline: !currentNote.titleStyle.underline })}
                   title="تسطير"
                 >
                   <span className="format-icon">U</span>
                 </button>
               </div>
 
-              <div className="format-group colors-group">
+              <div className="format-group">
                 <div className="dropdown">
                   <button
                     className="format-btn menu-btn"
@@ -803,23 +804,6 @@ function App() {
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div className="format-group emojis-group">
-                {TITLE_EMOJIS.map(item => (
-                  <button
-                    key={item.emoji}
-                    onClick={() => handleQuickEmojiTitle(item.emoji)}
-                    className="format-btn emoji-btn"
-                    title={item.label}
-                    style={{ 
-                      color: item.color,
-                      borderColor: item.color
-                    }}
-                  >
-                    {item.emoji}
-                  </button>
-                ))}
               </div>
             </div>
 
