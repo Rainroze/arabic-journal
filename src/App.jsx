@@ -508,6 +508,16 @@ function App() {
     setShowDialog(true)
   }
 
+  const formatText = (style) => {
+    setCurrentNote(prev => ({
+      ...prev,
+      textStyle: {
+        ...prev.textStyle,
+        ...style
+      }
+    }));
+  };
+
   return (
     <div className={`app ${darkMode ? 'dark' : ''}`} style={{ 
       backgroundColor: getTheme().background,
@@ -770,26 +780,14 @@ function App() {
               <div className="format-group">
                 <button
                   className={`format-btn ${currentNote.textStyle.bold ? 'active' : ''}`}
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      bold: !prev.textStyle.bold
-                    }
-                  }))}
+                  onClick={() => formatText({ bold: !currentNote.textStyle.bold })}
                   title="خط عريض"
                 >
                   <span className="format-icon">B</span>
                 </button>
                 <button
                   className={`format-btn ${currentNote.textStyle.underline ? 'active' : ''}`}
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      underline: !prev.textStyle.underline
-                    }
-                  }))}
+                  onClick={() => formatText({ underline: !currentNote.textStyle.underline })}
                   title="تسطير"
                 >
                   <span className="format-icon">U</span>
@@ -797,41 +795,53 @@ function App() {
               </div>
 
               <div className="format-group">
+                <div className="dropdown">
+                  <button
+                    className="format-btn menu-btn"
+                    onClick={() => setShowColorMenu(!showColorMenu)}
+                    title="تغيير لون النص"
+                  >
+                    <span className="format-icon">🎨</span>
+                  </button>
+                  {showColorMenu && (
+                    <div className="dropdown-menu colors-menu">
+                      {COLOR_PALETTE.map(item => (
+                        <button
+                          key={item.color}
+                          className="color-item"
+                          onClick={() => {
+                            formatText({ color: item.color });
+                            setShowColorMenu(false);
+                          }}
+                          title={item.label}
+                        >
+                          <span className="color-circle" style={{ backgroundColor: item.color }}></span>
+                          <span className="color-label">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="format-group">
                 <button
                   className={`format-btn ${currentNote.textStyle.align === 'right' ? 'active' : ''}`}
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      align: 'right'
-                    }
-                  }))}
+                  onClick={() => formatText({ align: 'right' })}
                   title="محاذاة لليمين"
                 >
                   ⇚
                 </button>
                 <button
                   className={`format-btn ${currentNote.textStyle.align === 'center' ? 'active' : ''}`}
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      align: 'center'
-                    }
-                  }))}
+                  onClick={() => formatText({ align: 'center' })}
                   title="توسيط"
                 >
                   ⇔
                 </button>
                 <button
                   className={`format-btn ${currentNote.textStyle.align === 'left' ? 'active' : ''}`}
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      align: 'left'
-                    }
-                  }))}
+                  onClick={() => formatText({ align: 'left' })}
                   title="محاذاة لليسار"
                 >
                   ⇛
@@ -840,50 +850,8 @@ function App() {
 
               <div className="format-group">
                 <button
-                  className="format-btn color-btn"
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      color: '#9C27B0'
-                    }
-                  }))}
-                  title="لون بنفسجي"
-                >
-                  <span className="color-circle purple"></span>
-                </button>
-                <button
-                  className="format-btn color-btn"
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      color: '#2196F3'
-                    }
-                  }))}
-                  title="لون أزرق"
-                >
-                  <span className="color-circle blue"></span>
-                </button>
-                <button
-                  className="format-btn color-btn"
-                  onClick={() => setCurrentNote(prev => ({
-                    ...prev,
-                    textStyle: {
-                      ...prev.textStyle,
-                      color: '#4CAF50'
-                    }
-                  }))}
-                  title="لون أخضر"
-                >
-                  <span className="color-circle green"></span>
-                </button>
-              </div>
-
-              <div className="format-group">
-                <button
-                  onClick={handleAddImage}
                   className="format-btn"
+                  onClick={handleAddImage}
                   title="إضافة صورة"
                 >
                   🖼️
@@ -928,7 +896,10 @@ function App() {
                   padding: '10px',
                   marginBottom: '10px',
                   backgroundColor: getTheme().inputBg,
-                  color: getTheme().text,
+                  color: currentNote.textStyle.color,
+                  fontWeight: currentNote.textStyle.bold ? 'bold' : 'normal',
+                  textDecoration: currentNote.textStyle.underline ? 'underline' : 'none',
+                  textAlign: currentNote.textStyle.align || 'right',
                   border: `1px solid ${getTheme().borderColor}`,
                   borderRadius: '4px',
                   resize: 'vertical'
