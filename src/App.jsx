@@ -359,20 +359,25 @@ function App() {
     }
   }
 
-  const handleNoteChange = (content) => {
-    setCurrentNote(prev => ({
-      ...prev,
-      content: content
-    }))
-  }
-
   const handleTitleChange = (e) => {
-    const value = e.target.value
-    setCurrentNote(prev => ({
-      ...prev,
-      title: value
-    }))
-  }
+    const value = e.target.value;
+    requestAnimationFrame(() => {
+      setCurrentNote(prev => ({
+        ...prev,
+        title: value
+      }));
+    });
+  };
+
+  const handleContentChange = (e) => {
+    const value = e.target.value;
+    requestAnimationFrame(() => {
+      setCurrentNote(prev => ({
+        ...prev,
+        content: value
+      }));
+    });
+  };
 
   useEffect(() => {
     try {
@@ -660,25 +665,25 @@ function App() {
               onChange={handleTitleChange}
               className="note-title-input"
               dir="rtl"
-              style={{ backgroundColor: currentNote.backgroundColor }}
+              autoComplete="off"
+              style={{ 
+                backgroundColor: currentNote.backgroundColor,
+                color: getTheme().text
+              }}
             />
             <textarea
               value={currentNote.content}
-              onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
+              onChange={handleContentChange}
               placeholder="اكتب مذكرتك هنا..."
               className="note-content-textarea"
               dir="rtl"
+              autoComplete="off"
               style={{ 
                 backgroundColor: currentNote.backgroundColor,
                 color: getTheme().text,
                 minHeight: '300px',
                 fontSize: getFontSize(fontSize),
-                fontFamily: 'Noto Sans Arabic, sans-serif',
-                padding: '12px',
-                border: `1px solid ${getTheme().borderColor}`,
-                borderRadius: '4px',
-                width: '100%',
-                resize: 'vertical'
+                fontFamily: 'Noto Sans Arabic, sans-serif'
               }}
             />
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '1rem' }}>
