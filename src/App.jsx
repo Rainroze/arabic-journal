@@ -766,8 +766,36 @@ function App() {
             maxWidth: '800px',
             width: '90%',
             maxHeight: '90vh',
-            overflow: 'auto'
+            overflow: 'auto',
+            position: 'relative'
           }}>
+            <button
+              onClick={() => setShowDialog(false)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                backgroundColor: 'transparent',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                padding: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: getTheme().text,
+                transition: 'all 0.2s ease',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                ':hover': {
+                  backgroundColor: 'rgba(0,0,0,0.1)'
+                }
+              }}
+              title="إغلاق"
+            >
+              ✕
+            </button>
             <div className="title-section" style={{ marginBottom: '1.5rem' }}>
               <input
                 type="text"
