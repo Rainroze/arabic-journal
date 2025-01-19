@@ -159,6 +159,18 @@ function App() {
     }));
   };
 
+  const handleEmojiSelectInContent = (emoji) => {
+    const textArea = document.querySelector('.note-content');
+    const start = textArea.selectionStart;
+    const end = textArea.selectionEnd;
+    const content = currentNote.content;
+    const newContent = content.substring(0, start) + emoji + content.substring(end);
+    setCurrentNote(prev => ({
+      ...prev,
+      content: newContent
+    }));
+  };
+
   const generateThemeFromColor = (color) => {
     return {
       light: {
@@ -656,7 +668,7 @@ function App() {
               fontWeight: '500',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
           >
             استيراد
@@ -672,7 +684,7 @@ function App() {
               fontWeight: '500',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
             }}
           >
             تصدير
@@ -715,34 +727,58 @@ function App() {
           {filteredNotes.map(note => (
             <div
               key={note.id}
-              className="note-card"
+              onClick={() => handleNoteClick(note)}
               style={{
-                backgroundColor: note.backgroundColor || '#f3e5f5',
-                border: `1px solid ${getTheme().borderColor}`,
-                padding: '15px',
-                borderRadius: '8px',
-                cursor: 'pointer'
+                backgroundColor: getTheme().cardBg,
+                borderRadius: '12px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                ':hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                }
               }}
-              onClick={() => handleEditClick(note)}
             >
-              <div className="note-header">
-                <h3
-                  style={{
-                    color: note.titleStyle?.color || '#2c3e50',
-                    fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
-                    textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
-                    margin: '0 0 10px 0'
-                  }}
-                >
-                  {note.title}
-                </h3>
-                <span className="note-date">{note.formattedDate}</span>
-              </div>
-              <div className="note-content">
-                <div dangerouslySetInnerHTML={renderNoteContent(note)} />
-              </div>
-              <div className="note-footer">
-                <span className="note-category">{note.category}</span>
+              <h3 style={{
+                margin: '0 0 1rem 0',
+                color: note.titleStyle?.color || getTheme().text,
+                fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
+                textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
+                fontSize: '1.2rem',
+                textAlign: 'right',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                justifyContent: 'flex-end'
+              }}>
+                {note.title}
+              </h3>
+              <p style={{
+                margin: 0,
+                color: getTheme().text,
+                opacity: 0.8,
+                fontSize: '1rem',
+                textAlign: 'right',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical'
+              }}>
+                {note.content}
+              </p>
+              <div style={{
+                marginTop: '1rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                color: getTheme().text,
+                opacity: 0.6,
+                fontSize: '0.9rem'
+              }}>
+                <span>{new Date(note.date).toLocaleDateString('ar-SA')}</span>
               </div>
             </div>
           ))}
@@ -983,6 +1019,36 @@ function App() {
                   😊
                 </button>
               </div>
+
+              <div className="format-group">
+                <div className="emoji-buttons" style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  {['😊', '❤️', '👍', '🌟', '✨', '🎯', '📝', '💡', '🎨', '📚'].map(emoji => (
+                    <button
+                      key={emoji}
+                      onClick={() => handleEmojiSelectInContent(emoji)}
+                      style={{
+                        padding: '0.5rem',
+                        border: 'none',
+                        borderRadius: '4px',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        fontSize: '1.2rem',
+                        transition: 'transform 0.2s',
+                        ':hover': {
+                          transform: 'scale(1.1)',
+                          backgroundColor: 'rgba(0,0,0,0.1)'
+                        }
+                      }}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <input
@@ -1005,22 +1071,24 @@ function App() {
 
             <div className="note-dialog-content">
               <textarea
+                className="note-content"
                 value={currentNote.content}
                 onChange={handleContentChange}
-                placeholder="محتوى المذكرة..."
+                placeholder="اكتب مذكرتك هنا..."
                 dir="rtl"
                 style={{
                   width: '100%',
                   minHeight: '200px',
-                  padding: '10px',
-                  marginBottom: '10px',
+                  padding: '1rem',
                   backgroundColor: getTheme().inputBg,
                   color: currentNote.textStyle.color,
                   fontWeight: currentNote.textStyle.bold ? 'bold' : 'normal',
                   textDecoration: currentNote.textStyle.underline ? 'underline' : 'none',
                   textAlign: currentNote.textStyle.align || 'right',
                   border: `1px solid ${getTheme().borderColor}`,
-                  borderRadius: '4px',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  lineHeight: '1.5',
                   resize: 'vertical'
                 }}
               />
