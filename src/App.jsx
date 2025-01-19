@@ -58,17 +58,31 @@ const CATEGORIES = [
   'مشاريع'
 ];
 
+const initialNoteState = {
+  id: '',
+  title: '',
+  content: '',
+  backgroundColor: '#f3e5f5',
+  category: 'عام',
+  titleStyle: {
+    bold: false,
+    underline: false,
+    color: '#2c3e50'
+  },
+  textStyle: {
+    bold: false,
+    underline: false,
+    align: 'right',
+    color: '#2c3e50'
+  }
+};
+
 function App() {
   const [notes, setNotes] = useState(() => {
     const savedNotes = localStorage.getItem('notes')
-    try {
-      return savedNotes ? JSON.parse(savedNotes) : []
-    } catch (error) {
-      console.error('خطأ في تحميل المذكرات:', error)
-      return []
-    }
+    return savedNotes ? JSON.parse(savedNotes) : []
   })
-  
+
   const [categories, setCategories] = useState(() => {
     const savedCategories = localStorage.getItem('categories')
     try {
@@ -92,24 +106,7 @@ function App() {
   })
   
   const [showDialog, setShowDialog] = useState(false)
-  const [currentNote, setCurrentNote] = useState({ 
-    id: '',
-    title: '', 
-    content: '', 
-    backgroundColor: '#f3e5f5',
-    category: 'عام',
-    titleStyle: {
-      bold: false,
-      underline: false,
-      color: '#2c3e50'
-    },
-    textStyle: {
-      bold: false,
-      underline: false,
-      align: 'right',
-      color: '#2c3e50'
-    }
-  })
+  const [currentNote, setCurrentNote] = useState(initialNoteState)
   const [isEditing, setIsEditing] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [fontSize, setFontSize] = useState(() => {
@@ -302,30 +299,17 @@ function App() {
   };
 
   const handleAddClick = () => {
-    setCurrentNote({
-      id: '',
-      title: '',
-      content: '',
-      backgroundColor: '#f3e5f5',
-      category: 'عام',
-      titleStyle: {
-        bold: false,
-        underline: false,
-        color: getTheme().text
-      },
-      textStyle: {
-        bold: false,
-        underline: false,
-        align: 'right',
-        color: getTheme().text
-      }
-    })
+    setCurrentNote(initialNoteState)
     setIsEditing(false)
     setShowDialog(true)
   }
 
   const handleEditClick = (note) => {
-    setCurrentNote(note)
+    setCurrentNote({
+      ...note,
+      titleStyle: note.titleStyle || initialNoteState.titleStyle,
+      textStyle: note.textStyle || initialNoteState.textStyle
+    })
     setIsEditing(true)
     setShowDialog(true)
   }
@@ -347,18 +331,7 @@ function App() {
       ...currentNote,
       id: isEditing ? currentNote.id : Date.now(),
       date: new Date().toISOString(),
-      formattedDate: formatDate(new Date()),
-      titleStyle: currentNote.titleStyle || {
-        bold: false,
-        underline: false,
-        color: getTheme().text
-      },
-      textStyle: currentNote.textStyle || {
-        bold: false,
-        underline: false,
-        align: 'right',
-        color: getTheme().text
-      }
+      formattedDate: formatDate(new Date())
     }
 
     const updatedNotes = isEditing
@@ -368,24 +341,7 @@ function App() {
     setNotes(updatedNotes)
     localStorage.setItem('notes', JSON.stringify(updatedNotes))
     setShowDialog(false)
-    setCurrentNote({
-      id: '',
-      title: '',
-      content: '',
-      backgroundColor: '#f3e5f5',
-      category: 'عام',
-      titleStyle: {
-        bold: false,
-        underline: false,
-        color: getTheme().text
-      },
-      textStyle: {
-        bold: false,
-        underline: false,
-        align: 'right',
-        color: getTheme().text
-      }
-    })
+    setCurrentNote(initialNoteState)
     setIsEditing(false)
   };
 
@@ -675,57 +631,28 @@ function App() {
                 key={note.id}
                 className="note-card"
                 style={{
-                  backgroundColor: note.backgroundColor || getTheme().cardBg,
-                  color: getTheme().text,
-                  border: `1px solid ${getTheme().borderColor}`,
-                  borderRadius: '8px',
-                  padding: '20px',
-                  marginBottom: '20px',
-                  boxShadow: `0 2px 4px ${getTheme().shadowColor}`,
-                  position: 'relative'
+                  backgroundColor: note.backgroundColor || '#f3e5f5',
+                  border: `1px solid ${getTheme().borderColor}`
                 }}
+                onClick={() => handleEditClick(note)}
               >
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '1.5em' }}>{note.title}</h3>
-                <div style={{ marginBottom: '10px', fontSize: '0.9em', color: getTheme().textSecondary }}>
-                  {note.formattedDate}
-                </div>
-                <div style={{ marginBottom: '10px', fontSize: '0.9em', color: getTheme().textSecondary }}>
-                  التصنيف: {note.category}
-                </div>
-                <div dangerouslySetInnerHTML={{ __html: note.content }} />
-                <div style={{
-                  position: 'absolute',
-                  top: '20px',
-                  left: '20px',
-                  display: 'flex',
-                  gap: '10px'
-                }}>
-                  <button
-                    onClick={() => handleNoteClick(note)}
+                <div className="note-header">
+                  <h3
                     style={{
-                      padding: '5px 10px',
-                      backgroundColor: getTheme().buttonBg,
-                      color: getTheme().buttonText,
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
+                      color: note.titleStyle?.color || '#2c3e50',
+                      fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
+                      textDecoration: note.titleStyle?.underline ? 'underline' : 'none'
                     }}
                   >
-                    تعديل
-                  </button>
-                  <button
-                    onClick={() => handleDeleteNote(note.id)}
-                    style={{
-                      padding: '5px 10px',
-                      backgroundColor: 'var(--danger)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    حذف
-                  </button>
+                    {note.title}
+                  </h3>
+                  <span className="note-date">{note.formattedDate}</span>
+                </div>
+                <div className="note-content">
+                  <p>{note.content}</p>
+                </div>
+                <div className="note-footer">
+                  <span className="note-category">{note.category}</span>
                 </div>
               </div>
             ))}
