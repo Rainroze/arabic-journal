@@ -453,11 +453,10 @@ function App() {
     try {
       const reader = new FileReader()
       reader.onloadend = () => {
-        const img = `<img src="${reader.result}" alt="صورة" style="max-width: 100%; height: auto; margin: 10px 0;" />`
-        const newContent = currentNote.content + img
+        const imageUrl = reader.result
         setCurrentNote(prev => ({
           ...prev,
-          content: newContent
+          content: prev.content + `\n<img src="${imageUrl}" alt="صورة" style="max-width: 100%; height: auto; display: block; margin: 10px auto;" />\n`
         }))
       }
       reader.readAsDataURL(file)
@@ -473,6 +472,10 @@ function App() {
     input.accept = 'image/*'
     input.onchange = handleImageUpload
     input.click()
+  }
+
+  const renderNoteContent = (content) => {
+    return { __html: content }
   }
 
   useEffect(() => {
@@ -678,7 +681,7 @@ function App() {
                   <span className="note-date">{note.formattedDate}</span>
                 </div>
                 <div className="note-content">
-                  <div dangerouslySetInnerHTML={{ __html: note.content }} />
+                  <div dangerouslySetInnerHTML={renderNoteContent(note.content)} />
                 </div>
                 <div className="note-footer">
                   <span className="note-category">{note.category}</span>
@@ -913,25 +916,38 @@ function App() {
               </div>
             )}
 
-            <textarea
-              value={currentNote.content}
-              onChange={handleContentChange}
-              placeholder="اكتب مذكرتك هنا..."
-              className="note-content-textarea"
-              dir="rtl"
-              autoComplete="off"
-              style={{ 
-                backgroundColor: currentNote.backgroundColor,
-                color: currentNote.textStyle.color,
-                fontWeight: currentNote.textStyle.bold ? 'bold' : 'normal',
-                fontStyle: currentNote.textStyle.italic ? 'italic' : 'normal',
-                textDecoration: currentNote.textStyle.underline ? 'underline' : 'none',
-                textAlign: currentNote.textStyle.align,
-                minHeight: '300px',
-                fontSize: getFontSize(fontSize),
-                fontFamily: 'Noto Sans Arabic, sans-serif'
-              }}
-            />
+            <div className="note-dialog-content">
+              <textarea
+                value={currentNote.content}
+                onChange={handleContentChange}
+                placeholder="محتوى المذكرة..."
+                dir="rtl"
+                style={{
+                  width: '100%',
+                  minHeight: '200px',
+                  padding: '10px',
+                  marginBottom: '10px',
+                  backgroundColor: getTheme().inputBg,
+                  color: getTheme().text,
+                  border: `1px solid ${getTheme().borderColor}`,
+                  borderRadius: '4px',
+                  resize: 'vertical'
+                }}
+              />
+              <div 
+                className="note-preview"
+                style={{
+                  marginTop: '20px',
+                  padding: '10px',
+                  border: `1px solid ${getTheme().borderColor}`,
+                  borderRadius: '4px',
+                  backgroundColor: getTheme().cardBg
+                }}
+              >
+                <div dangerouslySetInnerHTML={renderNoteContent(currentNote.content)} />
+              </div>
+            </div>
+
             <div className="dialog-buttons">
               <button
                 className="dialog-btn cancel-btn"
