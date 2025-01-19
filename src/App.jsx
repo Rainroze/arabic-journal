@@ -7,14 +7,10 @@ import Athkar from './components/Athkar'
 import Goals from './components/Goals'
 
 const QUICK_EMOJIS = [
-  { emoji: '⭐', label: 'نجمة' },
-  { emoji: '👍', label: 'أحسنت' },
-  { emoji: '🎯', label: 'هدف' },
-  { emoji: '💪', label: 'قوة' },
-  { emoji: '🌟', label: 'تألق' },
-  { emoji: '🏆', label: 'إنجاز' },
-  { emoji: '✨', label: 'تميز' },
-  { emoji: '🎉', label: 'احتفال' }
+  { emoji: '❤️', label: 'قلب' },
+  { emoji: '✨', label: 'نجوم' },
+  { emoji: '🌟', label: 'نجمة' },
+  { emoji: '🎨', label: 'فن' }
 ]
 
 const BACKGROUND_COLORS = [
@@ -138,7 +134,7 @@ function App() {
   };
 
   const handleEmojiSelect = (emojiData) => {
-    const emoji = emojiData.native;
+    const emoji = emojiData.native || emojiData;
     if (document.activeElement.classList.contains('note-title-input')) {
       handleQuickEmojiTitle(emoji);
     } else {
@@ -764,7 +760,10 @@ function App() {
 
               <div className="format-group">
                 <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  onClick={() => {
+                    document.querySelector('.note-title-input').focus();
+                    setShowEmojiPicker(!showEmojiPicker);
+                  }}
                   className="format-btn"
                   title="إضافة رموز تعبيرية"
                 >
@@ -878,9 +877,9 @@ function App() {
             {showEmojiPicker && (
               <div className="emoji-picker-container">
                 <EmojiPicker
-                  data={emojiData}
                   onEmojiSelect={handleEmojiSelect}
                   theme={darkMode ? 'dark' : 'light'}
+                  emojiStyle="native"
                 />
               </div>
             )}
