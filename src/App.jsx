@@ -340,22 +340,33 @@ function App() {
       return
     }
 
-    const noteToSave = {
+    const updatedNotes = [...notes];
+    const noteIndex = updatedNotes.findIndex(note => note.id === currentNote.id);
+
+    const savedNote = {
       ...currentNote,
-      id: isEditing ? currentNote.id : Date.now(),
       date: new Date().toISOString(),
-      formattedDate: formatDate(new Date())
+      content: currentNote.content || '',
+      title: currentNote.title.trim(),
+      titleStyle: currentNote.titleStyle || {},
+      textStyle: currentNote.textStyle || {}
+    };
+
+    if (noteIndex === -1) {
+      // مذكرة جديدة
+      updatedNotes.unshift({
+        ...savedNote,
+        id: Date.now().toString()
+      });
+    } else {
+      // تحديث مذكرة موجودة
+      updatedNotes[noteIndex] = savedNote;
     }
 
-    const updatedNotes = isEditing
-      ? notes.map(note => (note.id === currentNote.id ? noteToSave : note))
-      : [noteToSave, ...notes]
-
-    setNotes(updatedNotes)
-    localStorage.setItem('notes', JSON.stringify(updatedNotes))
-    setShowDialog(false)
-    setCurrentNote(initialNoteState)
-    setIsEditing(false)
+    setNotes(updatedNotes);
+    localStorage.setItem('notes', JSON.stringify(updatedNotes));
+    setShowDialog(false);
+    setCurrentNote(null);
   };
 
   const handleDeleteNote = () => {
@@ -557,10 +568,12 @@ function App() {
   const handleNoteClick = (note) => {
     setCurrentNote({
       ...note,
-    })
+      titleStyle: note.titleStyle || {},
+      textStyle: note.textStyle || {}
+    });
     setIsEditing(true)
     setShowDialog(true)
-  }
+  };
 
   const formatText = (style) => {
     setCurrentNote(prev => ({
@@ -571,6 +584,40 @@ function App() {
       }
     }));
   };
+
+  const createNewNote = () => {
+    setCurrentNote({
+      id: null,
+      title: '',
+      content: '',
+      date: new Date().toISOString(),
+      titleStyle: {},
+      textStyle: {}
+    });
+    setShowDialog(true);
+  };
+
+  useEffect(() => {
+    try {
+      const savedNotes = localStorage.getItem('notes');
+      if (savedNotes) {
+        const parsedNotes = JSON.parse(savedNotes);
+        // التأكد من أن كل المذكرات لديها الحقول المطلوبة
+        const validatedNotes = parsedNotes.map(note => ({
+          id: note.id || Date.now().toString(),
+          title: note.title || '',
+          content: note.content || '',
+          date: note.date || new Date().toISOString(),
+          titleStyle: note.titleStyle || {},
+          textStyle: note.textStyle || {}
+        }));
+        setNotes(validatedNotes);
+      }
+    } catch (error) {
+      console.error('Error loading notes:', error);
+      setNotes([]);
+    }
+  }, []);
 
   return (
     <div className="app" style={{ 
@@ -605,6 +652,41 @@ function App() {
             }}
           />
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button
+            onClick={() => fileInputRef.current.click()}
+            style={{
+              padding: '0.75rem 2rem',
+              border: 'none',
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
+              color: 'white',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            استيراد
+          </button>
+          <button
+            onClick={exportNotes}
+            style={{
+              padding: '0.75rem 2rem',
+              border: 'none',
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
+              color: 'white',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            تصدير
+          </button>
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button
             onClick={() => setDarkMode(!darkMode)}
@@ -705,51 +787,9 @@ function App() {
           gap: '1rem',
           margin: '2rem 0' 
         }}>
-          <button
-            onClick={() => fileInputRef.current.click()}
-            style={{
-              padding: '0.75rem 2rem',
-              border: 'none',
-              borderRadius: '8px',
-              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
-              color: 'white',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-          >
-            استيراد
-          </button>
-          <button
-            onClick={exportNotes}
-            style={{
-              padding: '0.75rem 2rem',
-              border: 'none',
-              borderRadius: '8px',
-              background: `linear-gradient(135deg, ${getTheme().gradientStart}, ${getTheme().gradientEnd})`,
-              color: 'white',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-          >
-            تصدير
-          </button>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '2rem',
-          padding: '2rem',
-          maxWidth: '1400px',
-          margin: '0 auto'
-        }}>
           <button 
             className="add-note-button" 
-            onClick={handleAddClick}
+            onClick={createNewNote}
             style={{
               backgroundColor: getTheme().buttonBg,
               color: getTheme().buttonText,
@@ -772,7 +812,7 @@ function App() {
             إضافة مذكرة جديدة
           </button>
 
-          {filteredNotes.map(note => (
+          {notes.map((note) => (
             <div
               key={note.id}
               className="note-card"
@@ -783,48 +823,55 @@ function App() {
                 marginBottom: '1rem',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontSize: '1.1rem',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem'
+                ':hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)'
+                }
               }}
             >
               <div className="note-header" style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
+                justifyContent: 'space-between',
                 marginBottom: '0.5rem'
               }}>
-                <span style={{
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  color: getTheme().text
+                <h3 style={{
+                  margin: 0,
+                  color: note.titleStyle?.color || getTheme().text,
+                  fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
+                  fontSize: '1.2rem'
                 }}>
                   {note.title}
-                </span>
+                </h3>
               </div>
               
               <div className="note-preview" style={{
                 color: getTheme().text,
                 opacity: 0.8,
                 fontSize: '0.9rem',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                maxHeight: '3em',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical'
               }}>
                 {renderNotePreview(note.content)}
               </div>
               
               <div className="note-footer" style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
                 marginTop: '0.5rem',
                 fontSize: '0.8rem',
                 color: getTheme().text,
                 opacity: 0.6
               }}>
-                <span>{note.date}</span>
+                <span>{new Date(note.date).toLocaleDateString('ar-SA')}</span>
               </div>
             </div>
           ))}
