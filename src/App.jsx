@@ -516,12 +516,30 @@ function App() {
 
   const renderNoteContent = (content) => {
     if (!content) return '';
-    return content.split('\n').map((line, index) => {
-      if (line.trim().startsWith('<img')) {
-        return line;
-      }
-      return line + '\n';
-    }).join('');
+    // تنظيف وتنسيق محتوى HTML
+    const cleanContent = content
+      .replace(/<img[^>]*src="([^"]*)"[^>]*>/g, (match, src) => {
+        return `<img src="${src}" alt="صورة مرفقة" style="max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;" />`;
+      })
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&');
+    
+    return cleanContent;
+  };
+
+  const renderNotePreview = (content) => {
+    if (!content) return '';
+    // إزالة العلامات HTML للعرض في القائمة
+    const textContent = content
+      .replace(/<[^>]+>/g, '') // إزالة كل علامات HTML
+      .replace(/\n/g, ' ') // استبدال الأسطر الجديدة بمسافات
+      .trim();
+    
+    // اقتصار النص على 100 حرف
+    return textContent.length > 100 ? textContent.substring(0, 100) + '...' : textContent;
   };
 
   useEffect(() => {
@@ -757,58 +775,56 @@ function App() {
           {filteredNotes.map(note => (
             <div
               key={note.id}
+              className="note-card"
               onClick={() => handleNoteClick(note)}
               style={{
                 backgroundColor: getTheme().cardBg,
-                borderRadius: '12px',
-                padding: '1.5rem',
+                padding: '1rem',
+                marginBottom: '1rem',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                ':hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-                }
+                fontSize: '1.1rem',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
               }}
             >
-              <h3 style={{
-                margin: '0 0 1rem 0',
-                color: note.titleStyle?.color || getTheme().text,
-                fontWeight: note.titleStyle?.bold ? 'bold' : 'normal',
-                textDecoration: note.titleStyle?.underline ? 'underline' : 'none',
-                fontSize: '1.2rem',
-                textAlign: 'right',
+              <div className="note-header" style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                justifyContent: 'flex-end'
+                marginBottom: '0.5rem'
               }}>
-                {note.title}
-              </h3>
-              <p style={{
-                margin: 0,
+                <span style={{
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  color: getTheme().text
+                }}>
+                  {note.title}
+                </span>
+              </div>
+              
+              <div className="note-preview" style={{
                 color: getTheme().text,
                 opacity: 0.8,
-                fontSize: '1rem',
-                textAlign: 'right',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical'
+                fontSize: '0.9rem',
+                lineHeight: '1.4'
               }}>
-                {note.content}
-              </p>
-              <div style={{
-                marginTop: '1rem',
+                {renderNotePreview(note.content)}
+              </div>
+              
+              <div className="note-footer" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
+                marginTop: '0.5rem',
+                fontSize: '0.8rem',
                 color: getTheme().text,
-                opacity: 0.6,
-                fontSize: '0.9rem'
+                opacity: 0.6
               }}>
-                <span>{new Date(note.date).toLocaleDateString('ar-SA')}</span>
+                <span>{note.date}</span>
               </div>
             </div>
           ))}
@@ -981,7 +997,6 @@ function App() {
             <div className="note-content-wrapper" style={{
               border: `1px solid ${getTheme().borderColor}`,
               borderRadius: '8px',
-              padding: '1rem',
               backgroundColor: getTheme().inputBg
             }}>
               <div
