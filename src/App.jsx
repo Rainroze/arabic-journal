@@ -123,6 +123,7 @@ function App() {
   });
   const fileInputRef = useRef(null)
   const settingsRef = useRef(null)
+  const imageInputRef = useRef(null)
 
   const [showColorMenu, setShowColorMenu] = useState(false);
 
@@ -456,24 +457,54 @@ function App() {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
+    const file = e.target.files[0];
+    if (file) {
+      try {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            // الحد الأقصى للأبعاد
+            const maxWidth = 800;
+            const maxHeight = 600;
+            
+            let width = img.width;
+            let height = img.height;
+            
+            // تقليل حجم الصورة إذا كانت كبيرة جداً
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width *= ratio;
+              height *= ratio;
+            }
 
-    try {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const imageUrl = reader.result
-        setCurrentNote(prev => ({
-          ...prev,
-          content: prev.content + `\n<img src="${imageUrl}" alt="صورة" style="max-width: 100%; height: auto; display: block; margin: 10px auto;" />\n`
-        }))
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const optimizedImage = canvas.toDataURL('image/jpeg', 0.8);
+            const imageTag = `\n<img src="${optimizedImage}" alt="صورة مرفقة" style="max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0;" />\n`;
+            
+            const textArea = document.querySelector('.note-content');
+            const cursorPosition = textArea.selectionStart;
+            const currentContent = currentNote.content;
+            const newContent = currentContent.slice(0, cursorPosition) + imageTag + currentContent.slice(cursorPosition);
+            
+            setCurrentNote(prev => ({
+              ...prev,
+              content: newContent
+            }));
+          };
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('خطأ في رفع الصورة:', error);
       }
-      reader.readAsDataURL(file)
-    } catch (error) {
-      console.error('خطأ في تحميل الصورة:', error)
-      alert('حدث خطأ أثناء تحميل الصورة')
     }
-  }
+  };
 
   const handleAddImage = () => {
     const input = document.createElement('input')
@@ -483,16 +514,15 @@ function App() {
     input.click()
   }
 
-  const renderNoteContent = (note) => {
-    const textStyle = note.textStyle || {};
-    const styledContent = `<div style="
-      color: ${textStyle.color || getTheme().text};
-      font-weight: ${textStyle.bold ? 'bold' : 'normal'};
-      text-decoration: ${textStyle.underline ? 'underline' : 'none'};
-      text-align: ${textStyle.align || 'right'};
-    ">${note.content}</div>`;
-    return { __html: styledContent };
-  }
+  const renderNoteContent = (content) => {
+    if (!content) return '';
+    return content.split('\n').map((line, index) => {
+      if (line.trim().startsWith('<img')) {
+        return line;
+      }
+      return line + '\n';
+    }).join('');
+  };
 
   useEffect(() => {
     try {
@@ -711,7 +741,7 @@ function App() {
               fontSize: '1.1rem',
               cursor: 'pointer',
               transition: 'transform 0.2s, box-shadow 0.2s',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -882,194 +912,89 @@ function App() {
               </div>
             </div>
 
-            <div className="format-toolbar">
-              <div className="format-group">
+            <div className="format-toolbar" style={{
+              display: 'flex',
+              gap: '1rem',
+              marginBottom: '1rem',
+              padding: '1rem',
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              borderRadius: '8px',
+              flexWrap: 'wrap'
+            }}>
+              {/* أزرار التنسيق */}
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
-                  className={`format-btn ${currentNote.titleStyle.bold ? 'active' : ''}`}
-                  onClick={() => formatTitle({ bold: !currentNote.titleStyle.bold })}
-                  title="خط عريض"
+                  onClick={() => imageInputRef.current.click()}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: getTheme().buttonBg,
+                    color: getTheme().buttonText,
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
                 >
-                  <span className="format-icon">B</span>
+                  📷 إضافة صورة
                 </button>
-                <button
-                  className={`format-btn ${currentNote.titleStyle.underline ? 'active' : ''}`}
-                  onClick={() => formatTitle({ underline: !currentNote.titleStyle.underline })}
-                  title="تسطير"
-                >
-                  <span className="format-icon">U</span>
-                </button>
-              </div>
-
-              <div className="format-group">
-                <div className="dropdown">
-                  <button
-                    className="format-btn menu-btn"
-                    onClick={() => setShowColorMenu(!showColorMenu)}
-                    title="تغيير لون النص"
-                  >
-                    <span className="format-icon">🎨</span>
-                  </button>
-                  {showColorMenu && (
-                    <div className="dropdown-menu colors-menu">
-                      {COLOR_PALETTE.map(item => (
-                        <button
-                          key={item.color}
-                          className="color-item"
-                          onClick={() => {
-                            formatTitle({ color: item.color });
-                            setShowColorMenu(false);
-                          }}
-                          title={item.label}
-                        >
-                          <span className="color-circle" style={{ backgroundColor: item.color }}></span>
-                          <span className="color-label">{item.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="editor-toolbar">
-              <div className="format-group">
-                <button
-                  className={`format-btn ${currentNote.textStyle.bold ? 'active' : ''}`}
-                  onClick={() => formatText({ bold: !currentNote.textStyle.bold })}
-                  title="خط عريض"
-                >
-                  <span className="format-icon">B</span>
-                </button>
-                <button
-                  className={`format-btn ${currentNote.textStyle.underline ? 'active' : ''}`}
-                  onClick={() => formatText({ underline: !currentNote.textStyle.underline })}
-                  title="تسطير"
-                >
-                  <span className="format-icon">U</span>
-                </button>
-              </div>
-
-              <div className="format-group">
-                <div className="dropdown">
-                  <button
-                    className="format-btn menu-btn"
-                    onClick={() => setShowColorMenu(!showColorMenu)}
-                    title="تغيير لون النص"
-                  >
-                    <span className="format-icon">🎨</span>
-                  </button>
-                  {showColorMenu && (
-                    <div className="dropdown-menu colors-menu">
-                      {COLOR_PALETTE.map(item => (
-                        <button
-                          key={item.color}
-                          className="color-item"
-                          onClick={() => {
-                            formatText({ color: item.color });
-                            setShowColorMenu(false);
-                          }}
-                          title={item.label}
-                        >
-                          <span className="color-circle" style={{ backgroundColor: item.color }}></span>
-                          <span className="color-label">{item.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="format-group">
-                <button
-                  className={`format-btn ${currentNote.textStyle.align === 'right' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'right' })}
-                  title="محاذاة لليمين"
-                >
-                  ⇚
-                </button>
-                <button
-                  className={`format-btn ${currentNote.textStyle.align === 'center' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'center' })}
-                  title="توسيط"
-                >
-                  ⇔
-                </button>
-                <button
-                  className={`format-btn ${currentNote.textStyle.align === 'left' ? 'active' : ''}`}
-                  onClick={() => formatText({ align: 'left' })}
-                  title="محاذاة لليسار"
-                >
-                  ⇛
-                </button>
-              </div>
-
-              <div className="format-group">
-                <button
-                  className="format-btn"
-                  onClick={handleAddImage}
-                  title="إضافة صورة"
-                >
-                  🖼️
-                </button>
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="format-btn"
-                  title="إضافة رموز تعبيرية"
-                >
-                  😊
-                </button>
-              </div>
-
-              <div className="format-group">
-                <div className="emoji-buttons" style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  flexWrap: 'wrap'
-                }}>
-                  {['😊', '❤️', '👍', '🌟', '✨', '🎯', '📝', '💡', '🎨', '📚'].map(emoji => (
-                    <button
-                      key={emoji}
-                      onClick={() => handleEmojiSelectInContent(emoji)}
-                      style={{
-                        padding: '0.5rem',
-                        border: 'none',
-                        borderRadius: '4px',
-                        backgroundColor: 'transparent',
-                        cursor: 'pointer',
-                        fontSize: '1.2rem',
-                        transition: 'transform 0.2s',
-                        ':hover': {
-                          transform: 'scale(1.1)',
-                          backgroundColor: 'rgba(0,0,0,0.1)'
-                        }
-                      }}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-              accept="image/*"
-              style={{ display: 'none' }}
-            />
-
-            {showEmojiPicker && (
-              <div className="emoji-picker-container">
-                <EmojiPicker
-                  onEmojiSelect={handleEmojiSelect}
-                  theme={darkMode ? 'dark' : 'light'}
-                  emojiStyle="native"
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                  ref={imageInputRef}
                 />
               </div>
-            )}
 
-            <div className="note-dialog-content">
+              {/* أزرار الإيموجي */}
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                flexWrap: 'wrap'
+              }}>
+                {['😊', '❤️', '👍', '🌟', '✨', '🎯', '📝', '💡', '🎨', '📚'].map(emoji => (
+                  <button
+                    key={emoji}
+                    onClick={() => handleEmojiSelectInContent(emoji)}
+                    style={{
+                      padding: '0.5rem',
+                      border: 'none',
+                      borderRadius: '4px',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      transition: 'all 0.2s ease',
+                      ':hover': {
+                        transform: 'scale(1.1)',
+                        backgroundColor: 'rgba(0,0,0,0.1)'
+                      }
+                    }}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="note-content-wrapper" style={{
+              border: `1px solid ${getTheme().borderColor}`,
+              borderRadius: '8px',
+              padding: '1rem',
+              backgroundColor: getTheme().inputBg
+            }}>
+              <div
+                className="note-content-display"
+                style={{
+                  minHeight: '200px',
+                  color: getTheme().text,
+                  fontSize: '1rem',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap'
+                }}
+                dangerouslySetInnerHTML={{ __html: renderNoteContent(currentNote.content) }}
+              />
               <textarea
                 className="note-content"
                 value={currentNote.content}
@@ -1080,30 +1005,14 @@ function App() {
                   width: '100%',
                   minHeight: '200px',
                   padding: '1rem',
-                  backgroundColor: getTheme().inputBg,
-                  color: currentNote.textStyle.color,
-                  fontWeight: currentNote.textStyle.bold ? 'bold' : 'normal',
-                  textDecoration: currentNote.textStyle.underline ? 'underline' : 'none',
-                  textAlign: currentNote.textStyle.align || 'right',
-                  border: `1px solid ${getTheme().borderColor}`,
-                  borderRadius: '8px',
+                  backgroundColor: 'transparent',
+                  color: getTheme().text,
+                  border: 'none',
                   fontSize: '1rem',
                   lineHeight: '1.5',
                   resize: 'vertical'
                 }}
               />
-              <div 
-                className="note-preview"
-                style={{
-                  marginTop: '20px',
-                  padding: '10px',
-                  border: `1px solid ${getTheme().borderColor}`,
-                  borderRadius: '4px',
-                  backgroundColor: getTheme().cardBg
-                }}
-              >
-                <div dangerouslySetInnerHTML={renderNoteContent(currentNote)} />
-              </div>
             </div>
 
             <div style={{ 
